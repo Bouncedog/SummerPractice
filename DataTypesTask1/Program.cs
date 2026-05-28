@@ -4,15 +4,16 @@ namespace DataTypesTask1
 {
     public class Program
     {
-        public static string CalculationCompoundInterest(double initialDeposit, uint years, double interestRate)
+        public static string CalculateCompoundInterest(double initialDeposit, uint years, double interestRate)
         {
             StringBuilder result = new();
+            var currentAmount = initialDeposit;
 
             for (var i = 1; i <= years; i++)
             {
-                double interestRateResult = initialDeposit / 100.0 * interestRate;
-                initialDeposit += interestRateResult;
-                result.AppendLine($"Год {i}: {initialDeposit.ToString("0.00")} руб.");
+                double interestRateResult = currentAmount / 100.0 * interestRate;
+                currentAmount += interestRateResult;
+                result.AppendLine($"Год {i}: {currentAmount.ToString("0.00")} руб.");
             }
 
             return result.ToString();
@@ -20,7 +21,7 @@ namespace DataTypesTask1
 
         static void Main(string[] args)
         {
-            Console.WriteLine(CalculationCompoundInterest(1000, 3, 10));
+            Console.WriteLine(CalculateCompoundInterest(1000, 3, 10));
         }
     }
 }
