@@ -6,6 +6,21 @@ namespace DataTypesTask1
     {
         public static string CalculateCompoundInterest(double initialDeposit, uint years, double interestRate)
         {
+            if (initialDeposit <= 0)
+            {
+                throw new ArgumentException("Первоначальный взнос должен быть положительным числом");
+            }
+
+            if (interestRate <= 0)
+            {
+                throw new ArgumentException("Процентная ставка должна быть положительным числом");
+            }
+
+            if (years == 0)
+            {
+                throw new ArgumentException("Количество лет должно быть положительным целым числом");
+            }
+
             StringBuilder result = new();
             var currentAmount = initialDeposit;
 
