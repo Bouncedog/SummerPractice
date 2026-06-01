@@ -10,7 +10,7 @@ namespace DataTypesTask1
         /// <param name="initialDeposit">начальный вклад (положительное число).</param>
         /// <param name="years">количество лет (положительное целое число).</param>
         /// <param name="interestRate">годовая процентная ставка (положительное число).</param>
-        private static string CalculateCompoundInterest(double initialDeposit, uint years, double interestRate)
+        public static string CalculateCompoundInterest(double initialDeposit, uint years, double interestRate)
         {
             if (initialDeposit <= 0)
             {
