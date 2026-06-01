@@ -1,6 +1,6 @@
 ﻿namespace ObjectOrientedProgrammingTask1
 {
-    internal class Program
+    public class Program
     {
         //Тема 2: Товароведение - продукты
         //Написать класс Product, описывающий товар
@@ -9,9 +9,9 @@
         //Программа должна запрашивать информацию с консоли и выводить на консоль результат.
         //Необходимо переопределить ToString у класса Product.
 
-        class Product()
-        { 
-            
+        private class Product()
+        {
+
         }
 
         static void Main(string[] args)

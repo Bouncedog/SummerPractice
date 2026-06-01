@@ -2,7 +2,7 @@
 
 namespace DataTypesTask2
 {
-    internal class Program
+    public class Program
     {
         /// <summary>
         /// Рисует ромб
