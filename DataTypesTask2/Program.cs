@@ -4,6 +4,10 @@ namespace DataTypesTask2
 {
     internal class Program
     {
+        /// <summary>
+        /// Рисует ромб
+        /// </summary>
+        /// <param name="N">длина диагонали ромба (должно быть положительным нечётным числом).</param>
         public static void PrintRhomb(int N)
         {
             if (N % 2 == 0 || N <= 0)
@@ -30,7 +34,7 @@ namespace DataTypesTask2
 
         static void Main(string[] args)
         {
-            PrintRhomb(5);
+            PrintRhomb(10);
         }
     }
 }

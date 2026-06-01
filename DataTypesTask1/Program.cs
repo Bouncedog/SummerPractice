@@ -4,6 +4,12 @@ namespace DataTypesTask1
 {
     public class Program
     {
+        /// <summary>
+        /// Формирует и возвращает строку с расчетом сложных процентов по годам.
+        /// </summary>
+        /// <param name="initialDeposit">начальный вклад (положительное число).</param>
+        /// <param name="years">количество лет (положительное целое число).</param>
+        /// <param name="interestRate">годовая процентная ставка (положительное число).</param>
         public static string CalculateCompoundInterest(double initialDeposit, uint years, double interestRate)
         {
             if (initialDeposit <= 0)
