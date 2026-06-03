@@ -34,7 +34,7 @@ namespace DataTypesTask2
 
         static void Main(string[] args)
         {
-            PrintRhomb(10);
+            PrintRhomb(5);
         }
     }
 }
