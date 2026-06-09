@@ -2,7 +2,7 @@
 
 namespace DataTypesTask2
 {
-    public class Program
+    internal class Program
     {
         /// <summary>
         /// Рисует ромб
@@ -32,7 +32,7 @@ namespace DataTypesTask2
             }
         }
 
-        static void Main(string[] args)
+        static void Main()
         {
             PrintRhomb(5);
         }

@@ -2,7 +2,7 @@
 
 namespace DataTypesTask1
 {
-    public class Program
+    internal class Program
     {
         /// <summary>
         /// Формирует и возвращает строку с расчетом сложных процентов по годам.
@@ -40,7 +40,7 @@ namespace DataTypesTask1
             return result.ToString();
         }
 
-        static void Main(string[] args)
+        static void Main()
         {
             Console.WriteLine(CalculateCompoundInterest(1000, 3, 10));
         }

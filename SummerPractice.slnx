@@ -2,4 +2,5 @@
   <Project Path="DataTypesTask1/DataTypesTask1.csproj" />
   <Project Path="DataTypesTask2/DataTypesTask2.csproj" Id="db60504d-802f-4432-b50a-f26419860c6c" />
   <Project Path="ObjectOrientedProgrammingTask1/ObjectOrientedProgrammingTask1.csproj" Id="0ae206be-f4b4-4c63-bea7-51055d3e22da" />
+  <Project Path="СollectionsTask1/СollectionsTask1.csproj" Id="2d7090a6-1c1d-490a-97e0-862ed2f5626a" />
 </Solution>

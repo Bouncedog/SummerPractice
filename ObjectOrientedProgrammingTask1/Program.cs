@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace ObjectOrientedProgrammingTask1
 {
-    public class Program
+    internal class Program
     {
         private static List<Product> s_products = [];
 
@@ -36,19 +36,19 @@ namespace ObjectOrientedProgrammingTask1
         static void CreateProduct()
         {
             Console.WriteLine("\nВведите наименование товара:");
-            string name = Console.ReadLine();
+            string name = Console.ReadLine()!;
 
             Console.WriteLine("Введите производителя:");
-            string manufacturer = Console.ReadLine();
+            string manufacturer = Console.ReadLine()!;
 
-            Console.WriteLine("Введите цену:");
-            double price = double.Parse(Console.ReadLine());
+            Console.WriteLine("(Обязательно заполнить) Введите цену:");
+            double price = double.Parse(Console.ReadLine()!);
 
-            Console.WriteLine("Введите срок годности в днях:");
-            int storageLifeInDays = int.Parse(Console.ReadLine());
+            Console.WriteLine("(Обязательно заполнить) Введите срок годности в днях:");
+            int storageLifeInDays = int.Parse(Console.ReadLine()!);
 
-            Console.WriteLine("Введите дату производства (дд.мм.гггг):");
-            DateTime productionDate = DateTime.Parse(Console.ReadLine());
+            Console.WriteLine("(Обязательно заполнить) Введите дату производства (дд.мм.гггг):");
+            DateTime productionDate = DateTime.Parse(Console.ReadLine()!);
 
             Product product = new(name, manufacturer, price, storageLifeInDays, productionDate);
             s_products.Add(product);
@@ -73,7 +73,7 @@ namespace ObjectOrientedProgrammingTask1
             }
         }
 
-        static void Main(string[] args)
+        static void Main()
         {
             while (true)
             {
