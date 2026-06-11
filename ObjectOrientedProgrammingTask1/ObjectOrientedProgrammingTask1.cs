@@ -3,9 +3,9 @@ using System.Xml.Linq;
 
 namespace ObjectOrientedProgrammingTask1
 {
-    internal class Program
+    internal class ObjectOrientedProgrammingTask1
     {
-        private static List<Product> s_products = [];
+        private static readonly List<Product> s_products = [];
 
         /// <summary>
         /// Создаёт новый продукт.

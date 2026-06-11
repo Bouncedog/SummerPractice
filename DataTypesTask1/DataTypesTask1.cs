@@ -2,7 +2,7 @@
 
 namespace DataTypesTask1
 {
-    internal class Program
+    internal class DataTypesTask1
     {
         /// <summary>
         /// Формирует и возвращает строку с расчетом сложных процентов по годам.
