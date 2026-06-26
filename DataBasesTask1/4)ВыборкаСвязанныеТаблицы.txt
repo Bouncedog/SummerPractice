@@ -10,10 +10,10 @@ from Games
 join GameGenre
     on Games.GameID = GameGenre.GameID
 
-/*
-left join (Все игры, даже если жанров нет)
-right join (Все жанры, даже если игр нет)
-*/ 
+
+-- left join (Все игры, даже если жанров нет)
+-- right join (Все жанры, даже если игр нет)
+ 
 join dbo.Genres
     on GameGenre.GenreID = Genres.GenreID
 
