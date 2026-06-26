@@ -1,0 +1,9 @@
+select
+    GameName,
+    Price,
+    ReleaseDate
+
+from Games
+where Price > 20
+
+order by Price desc, GameName asc;

@@ -1,0 +1,12 @@
+select
+    Developers.DeveloperName,
+    avg(Games.Price) as AvgPrice -- если у разработчика больше 1 игры, то будет указана средняя цена по всем играм.
+
+from Developers
+
+join Games
+    on Developers.DeveloperID = Games.DeveloperID
+
+group by Developers.DeveloperName
+
+order by AvgPrice desc;

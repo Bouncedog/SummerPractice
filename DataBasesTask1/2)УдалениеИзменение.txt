@@ -1,0 +1,6 @@
+update Games
+set Price = 9.99
+where GameName = 'Braid';
+
+delete from Achievements
+where AchievementName = N'Сломанные очки';

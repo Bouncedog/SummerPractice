@@ -1,0 +1,40 @@
+select distinct
+    Games.GameName,
+    Games.Price,
+    Genres.GenreName
+
+from Games
+
+-- left join подходит и сюда, пример лишний решил не добавлять. (Все игры, даже если жанров нет)
+-- right join подходит и сюда, пример лишний решил не добавлять. (Все жанры, даже если игр нет)
+join GameGenre
+    on Games.GameID = GameGenre.GameID
+
+/*
+left join (Все игры, даже если жанров нет)
+right join (Все жанры, даже если игр нет)
+*/ 
+join dbo.Genres
+    on GameGenre.GenreID = Genres.GenreID
+
+order by Games.GameName, Genres.GenreName;
+
+-----
+-- Далее пример с пересечением.
+select GameName
+from Games
+where Games.Price < 20
+
+intersect
+
+select Games.GameName
+
+from Games
+
+join GameGenre
+    on Games.GameID = GameGenre.GameID
+
+join Genres
+    on GameGenre.GenreID = Genres.GenreID
+
+where Genres.GenreName = 'Indie';
