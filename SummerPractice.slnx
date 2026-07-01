@@ -6,6 +6,7 @@
     <File Path="DataBasesTask1/4)ВыборкаСвязанныеТаблицы.txt" />
     <File Path="DataBasesTask1/TestDB.bak" />
   </Folder>
+  <Project Path="CRUDrequests/CRUDrequestsTask1.csproj" Id="20c2bff9-981d-4f04-b8e2-2a47c29fb84e" />
   <Project Path="DataTypesTask1/DataTypesTask1.csproj" />
   <Project Path="DataTypesTask2/DataTypesTask2.csproj" Id="db60504d-802f-4432-b50a-f26419860c6c" />
   <Project Path="ObjectOrientedProgrammingTask1/ObjectOrientedProgrammingTask1.csproj" Id="0ae206be-f4b4-4c63-bea7-51055d3e22da" />
