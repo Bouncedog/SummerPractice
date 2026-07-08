@@ -1,0 +1,6 @@
+http://trainingapp.runasp.net/
+
+Сайт выложен на бесплатном хостинге, но возможны проблемы
+с подключением к ".net", поэтому возможно придётся рассматривать обход.
+
+Swagger: http://trainingapp.runasp.net/swagger

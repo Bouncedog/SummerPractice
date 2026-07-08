@@ -1,40 +1,37 @@
-﻿using System.Linq.Expressions;
+﻿namespace DataTypesTask2;
 
-namespace DataTypesTask2
+internal class DataTypesTask2
 {
-    internal class DataTypesTask2
+    /// <summary>
+    /// Рисует ромб
+    /// </summary>
+    /// <param name="N">длина диагонали ромба (должно быть положительным нечётным числом).</param>
+    public static void PrintRhomb(int N)
     {
-        /// <summary>
-        /// Рисует ромб
-        /// </summary>
-        /// <param name="N">длина диагонали ромба (должно быть положительным нечётным числом).</param>
-        public static void PrintRhomb(int N)
+        if (N % 2 == 0 || N <= 0)
         {
-            if (N % 2 == 0 || N <= 0)
-            {
-                throw new ArgumentException("N должно быть положительным нечётным числом");
-            }
-
-            for (int i = 0; i < N; i++)
-            {
-                int numberSpacesOutside = Math.Abs(N / 2 - i);
-                string spacesOutside = new(' ', numberSpacesOutside);
-                Console.Write($"{spacesOutside}*");
-
-                int numberSpacesInside = N - 2 * numberSpacesOutside - 2;
-                if (numberSpacesInside > 0)
-                {
-                    string spacesInside = new(' ', numberSpacesInside);
-                    Console.Write($"{spacesInside}*");
-                }
-
-                Console.WriteLine();
-            }
+            throw new ArgumentException("N должно быть положительным нечётным числом");
         }
 
-        static void Main()
+        for (int i = 0; i < N; i++)
         {
-            PrintRhomb(5);
+            int numberSpacesOutside = Math.Abs(N / 2 - i);
+            string spacesOutside = new(' ', numberSpacesOutside);
+            Console.Write($"{spacesOutside}*");
+
+            int numberSpacesInside = N - 2 * numberSpacesOutside - 2;
+            if (numberSpacesInside > 0)
+            {
+                string spacesInside = new(' ', numberSpacesInside);
+                Console.Write($"{spacesInside}*");
+            }
+
+            Console.WriteLine();
         }
+    }
+
+    static void Main()
+    {
+        PrintRhomb(5);
     }
 }

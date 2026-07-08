@@ -1,0 +1,946 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учёт тренировок</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            padding: 24px;
+            color: #1e293b;
+        }
+
+        .app {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 28px 32px;
+        }
+
+        h1 {
+            font-weight: 300;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 16px;
+            margin-bottom: 28px;
+            color: #0b1a33;
+        }
+
+        /* Уведомления */
+        .notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border-left: 4px solid #2563eb;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .notification.error {
+                border-left-color: #dc2626;
+                background: #fef2f2;
+            }
+
+            .notification.warning {
+                border-left-color: #f59e0b;
+                background: #fffbeb;
+            }
+
+            .notification.info {
+                border-left-color: #2563eb;
+                background: #eff6ff;
+            }
+
+            .notification .text {
+                flex: 1;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .notification .close {
+                cursor: pointer;
+                font-size: 18px;
+                color: #64748b;
+                background: none;
+                border: none;
+                padding: 0 4px;
+                transition: color 0.15s;
+            }
+
+                .notification .close:hover {
+                    color: #1e293b;
+                }
+
+        /* Мигание */
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .notification.blink {
+            animation: blink 0.6s ease-in-out 3;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid #dde1e6;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+            .tabs button {
+                padding: 10px 24px;
+                border: none;
+                background: transparent;
+                border-radius: 0;
+                font-size: 15px;
+                font-weight: 500;
+                color: #64748b;
+                cursor: pointer;
+                transition: all 0.2s;
+                border-bottom: 2px solid transparent;
+                margin-bottom: -1px;
+            }
+
+                .tabs button.active {
+                    color: #2563eb;
+                    border-bottom-color: #2563eb;
+                }
+
+                .tabs button:hover {
+                    color: #1e293b;
+                    background: #f8fafc;
+                }
+
+        .tab-content {
+            animation: fade 0.2s ease;
+        }
+
+        @keyframes fade {
+            0% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+            .flex-row label {
+                font-weight: 500;
+                font-size: 14px;
+                color: #334155;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                white-space: nowrap;
+            }
+
+            .flex-row input, .flex-row select {
+                padding: 8px 12px;
+                border-radius: 6px;
+                border: 1px solid #cbd5e1;
+                background: #fff;
+                font-size: 14px;
+                flex: 1 1 160px;
+                min-width: 140px;
+                transition: border 0.15s;
+            }
+
+                .flex-row input:focus, .flex-row select:focus {
+                    outline: none;
+                    border-color: #2563eb;
+                    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+                }
+
+                .flex-row input[type="checkbox"] {
+                    width: 18px;
+                    height: 18px;
+                    accent-color: #2563eb;
+                    cursor: pointer;
+                }
+
+            .flex-row button {
+                padding: 8px 20px;
+                background: #2563eb;
+                border: none;
+                border-radius: 6px;
+                color: #fff;
+                font-weight: 500;
+                font-size: 14px;
+                cursor: pointer;
+                transition: background 0.15s;
+                white-space: nowrap;
+            }
+
+                .flex-row button:hover {
+                    background: #1d4ed8;
+                }
+
+                .flex-row button.danger {
+                    background: #dc2626;
+                }
+
+                    .flex-row button.danger:hover {
+                        background: #b91c1c;
+                    }
+
+                .flex-row button.secondary {
+                    background: #64748b;
+                }
+
+                    .flex-row button.secondary:hover {
+                        background: #475569;
+                    }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #cbd5e1;
+            color: #1e293b;
+        }
+
+            .badge.active {
+                background: #22c55e;
+                color: #fff;
+            }
+
+            .badge.inactive {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .sticker {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1e293b;
+            background: #e2e8f0;
+        }
+
+            .sticker.yellow {
+                background: #facc15;
+                color: #1e293b;
+            }
+
+            .sticker.green {
+                background: #22c55e;
+                color: #fff;
+            }
+
+            .sticker.red {
+                background: #ef4444;
+                color: #fff;
+            }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+            .filter-section label {
+                font-weight: 500;
+                font-size: 14px;
+                color: #334155;
+            }
+
+            .filter-section input[type="date"], .filter-section input[type="number"] {
+                padding: 6px 12px;
+                border-radius: 6px;
+                border: 1px solid #cbd5e1;
+                background: #fff;
+                font-size: 14px;
+                width: 140px;
+            }
+
+            .filter-section .total-info {
+                margin-left: auto;
+                font-weight: 500;
+                font-size: 15px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+            .actions-cell button {
+                padding: 4px 12px;
+                font-size: 12px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                background: #2563eb;
+                color: #fff;
+                transition: background 0.15s;
+            }
+
+                .actions-cell button:hover {
+                    background: #1d4ed8;
+                }
+
+                .actions-cell button.del {
+                    background: #dc2626;
+                }
+
+                    .actions-cell button.del:hover {
+                        background: #b91c1c;
+                    }
+
+                .actions-cell button.secondary {
+                    background: #64748b;
+                }
+
+                    .actions-cell button.secondary:hover {
+                        background: #475569;
+                    }
+
+        .empty {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .edit-panel {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 16px;
+        }
+
+            .edit-panel .flex-row {
+                margin-bottom: 0;
+            }
+
+        @media (max-width: 700px) {
+            .app {
+                padding: 16px;
+            }
+
+            .flex-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+                .flex-row label {
+                    white-space: normal;
+                }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+                .filter-section .total-info {
+                    margin-left: 0;
+                }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+            }
+
+            .tabs button {
+                padding: 8px 14px;
+                font-size: 14px;
+            }
+
+            .notifications {
+                max-width: 90%;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Блок уведомлений -->
+        <div class="notifications">
+            <div v-for="(n, idx) in notifications" :key="idx"
+                 class="notification" :class="[n.type, n.blink ? 'blink' : '']">
+                <span class="text">{{ n.text }}</span>
+                <button class="close" @click="removeNotification(idx)">&times;</button>
+            </div>
+        </div>
+
+        <div class="app">
+            <h1>Система учёта тренировок</h1>
+
+            <div class="tabs">
+                <button :class="{ active: tab === 'programs' }" @click="tab='programs'">Программы</button>
+                <button :class="{ active: tab === 'exercises' }" @click="tab='exercises'">Упражнения</button>
+                <button :class="{ active: tab === 'activities' }" @click="tab='activities'">Активности</button>
+            </div>
+
+            <!-- ===================== ПРОГРАММЫ ===================== -->
+            <div v-show="tab === 'programs'" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Добавить программу</div>
+                    <div class="flex-row">
+                        <input v-model="newProgram.name" placeholder="Название">
+                        <input v-model="newProgram.type" placeholder="Тип (Силовая, Кардио...)">
+                        <label><input type="checkbox" v-model="newProgram.isActive"> Активна</label>
+                        <button @click="addProgram">Добавить</button>
+                    </div>
+                </div>
+
+                <table>
+                    <thead><tr><th>Название</th><th>Тип</th><th>Статус</th><th>Действия</th></tr></thead>
+                    <tbody>
+                        <tr v-for="p in programs" :key="p.id">
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.type }}</td>
+                            <td><span class="badge" :class="p.isActive ? 'active' : 'inactive'">{{ p.isActive ? 'Активна' : 'Неактивна' }}</span></td>
+                            <td class="actions-cell">
+                                <button @click="startEditProgram(p)">Изменить</button>
+                                <button class="del" @click="deleteProgram(p.id)">Удалить</button>
+                            </td>
+                        </tr>
+                        <tr v-if="programs.length === 0"><td colspan="4" class="empty">Нет программ</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- Форма редактирования программы -->
+                <div v-if="editingProgram" class="edit-panel">
+                    <div class="card-title">Редактирование программы</div>
+                    <div class="flex-row">
+                        <input v-model="editProgram.name" placeholder="Название">
+                        <input v-model="editProgram.type" placeholder="Тип">
+                        <label><input type="checkbox" v-model="editProgram.isActive"> Активна</label>
+                        <button @click="saveEditProgram">Сохранить</button>
+                        <button class="secondary" @click="cancelEditProgram">Отмена</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== УПРАЖНЕНИЯ ===================== -->
+            <div v-show="tab === 'exercises'" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Добавить упражнение</div>
+                    <div class="flex-row">
+                        <input v-model="newExercise.name" placeholder="Название упражнения">
+                        <select v-model="newExercise.programId">
+                            <option v-for="p in programs" :value="p.id">{{ p.name }}</option>
+                        </select>
+                        <label><input type="checkbox" v-model="newExercise.isActive"> Активно</label>
+                        <button @click="addExercise">Добавить</button>
+                    </div>
+                </div>
+
+                <table>
+                    <thead><tr><th>Название</th><th>Программа</th><th>Статус</th><th>Действия</th></tr></thead>
+                    <tbody>
+                        <tr v-for="e in exercises" :key="e.id">
+                            <td>{{ e.name }}</td>
+                            <td>{{ getProgramName(e.programId) }}</td>
+                            <td><span class="badge" :class="e.isActive ? 'active' : 'inactive'">{{ e.isActive ? 'Активно' : 'Неактивно' }}</span></td>
+                            <td class="actions-cell">
+                                <button @click="startEditExercise(e)">Изменить</button>
+                                <button class="del" @click="deleteExercise(e.id)">Удалить</button>
+                            </td>
+                        </tr>
+                        <tr v-if="exercises.length === 0"><td colspan="4" class="empty">Нет упражнений</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- Форма редактирования упражнения -->
+                <div v-if="editingExercise" class="edit-panel">
+                    <div class="card-title">Редактирование упражнения</div>
+                    <div class="flex-row">
+                        <input v-model="editExercise.name" placeholder="Название">
+                        <select v-model="editExercise.programId">
+                            <option v-for="p in programs" :value="p.id">{{ p.name }}</option>
+                        </select>
+                        <label><input type="checkbox" v-model="editExercise.isActive"> Активно</label>
+                        <button @click="saveEditExercise">Сохранить</button>
+                        <button class="secondary" @click="cancelEditExercise">Отмена</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== АКТИВНОСТИ ===================== -->
+            <div v-show="tab === 'activities'" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Записать активность</div>
+                    <div class="flex-row">
+                        <select v-model="newActivity.exerciseId">
+                            <option v-for="e in activeExercises" :value="e.id">{{ e.name }}</option>
+                        </select>
+                        <input type="date" v-model="newActivity.date">
+                        <input type="number" v-model.number="newActivity.minutes" placeholder="Минуты (1–1440)" min="1" max="1440">
+                        <input v-model="newActivity.notes" placeholder="Примечания">
+                        <button @click="addActivity">Добавить</button>
+                    </div>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="filter-section">
+                    <label>Показать за:</label>
+                    <button class="info" @click="filterType='all'">Всё время</button>
+                    <button class="info" @click="filterType='day'">День</button>
+                    <button class="info" @click="filterType='month'">Месяц</button>
+                    <input type="date" v-model="filterDate" v-if="filterType === 'day'">
+                    <span v-if="filterType === 'month'">
+                        <input type="number" v-model.number="filterMonthYear" placeholder="Год" style="width:80px">
+                        <input type="number" v-model.number="filterMonth" placeholder="Месяц" style="width:70px">
+                    </span>
+                    <span class="total-info">
+                        <span>Сумма: {{ filteredTotalMinutes }} мин</span>
+                        <span v-if="filterType === 'day'" class="sticker" :class="daySticker">{{ dayStickerLabel }}</span>
+                    </span>
+                </div>
+
+                <table>
+                    <thead><tr><th>Дата</th><th>Упражнение</th><th>Минуты</th><th>Примечания</th><th>Действия</th></tr></thead>
+                    <tbody>
+                        <tr v-for="a in filteredActivities" :key="a.id">
+                            <td>{{ formatDate(a.date) }}</td>
+                            <td>{{ getExerciseName(a.exerciseId) }}</td>
+                            <td>{{ a.minutes }}</td>
+                            <td>{{ a.notes || '—' }}</td>
+                            <td class="actions-cell">
+                                <button @click="startEditActivity(a)">Изменить</button>
+                                <button class="del" @click="deleteActivity(a.id)">Удалить</button>
+                            </td>
+                        </tr>
+                        <tr v-if="filteredActivities.length === 0"><td colspan="5" class="empty">Нет активностей</td></tr>
+                    </tbody>
+                </table>
+
+                <!-- Форма редактирования активности -->
+                <div v-if="editingActivity" class="edit-panel">
+                    <div class="card-title">Редактирование активности</div>
+                    <div class="flex-row">
+                        <select v-model="editActivity.exerciseId">
+                            <option v-for="e in activeExercises" :value="e.id">{{ e.name }}</option>
+                        </select>
+                        <input type="date" v-model="editActivity.date">
+                        <input type="number" v-model.number="editActivity.minutes" placeholder="Минуты" min="1" max="1440">
+                        <input v-model="editActivity.notes" placeholder="Примечания">
+                        <button @click="saveEditActivity">Сохранить</button>
+                        <button class="secondary" @click="cancelEditActivity">Отмена</button>
+                    </div>
+                    <!-- Ошибка теперь отображается как уведомление, поэтому здесь не нужно -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Генерация или получение userId из localStorage
+        function getUserId() {
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+                localStorage.setItem('userId', userId);
+            }
+            return userId;
+        }
+
+        const userId = getUserId();
+
+        // Устанавливаем заголовок для всех запросов axios
+        axios.defaults.headers.common['X-UserId'] = userId;
+
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    tab: 'programs',
+                    programs: [],
+                    exercises: [],
+                    activities: [],
+                    newProgram: { name: '', type: '', isActive: true },
+                    newExercise: { name: '', programId: 1, isActive: true },
+                    newActivity: { exerciseId: 1, date: this.today(), minutes: 30, notes: '' },
+                    filterType: 'all',
+                    filterDate: this.today(),
+                    filterMonthYear: new Date().getFullYear(),
+                    filterMonth: new Date().getMonth() + 1,
+                    // Уведомления
+                    notifications: [],
+                    // Редактирование
+                    editingProgram: false,
+                    editProgram: { id: null, name: '', type: '', isActive: true },
+                    editingExercise: false,
+                    editExercise: { id: null, name: '', programId: 1, isActive: true },
+                    editingActivity: false,
+                    editActivity: { id: null, exerciseId: 1, date: '', minutes: 30, notes: '' },
+                };
+            },
+            computed: {
+                activeExercises() {
+                    return this.exercises.filter(e => e.isActive);
+                },
+                filteredActivities() {
+                    let list = [...this.activities];
+                    if (this.filterType === 'day') {
+                        list = list.filter(a => a.date.substring(0, 10) === this.filterDate);
+                    } else if (this.filterType === 'month') {
+                        const prefix = `${this.filterMonthYear}-${String(this.filterMonth).padStart(2, '0')}`;
+                        list = list.filter(a => a.date.startsWith(prefix));
+                    }
+                    list.sort((a, b) => b.date.localeCompare(a.date) || a.id - b.id);
+                    return list;
+                },
+                filteredTotalMinutes() {
+                    return this.filteredActivities.reduce((s, a) => s + a.minutes, 0);
+                },
+                daySticker() {
+                    if (this.filterType !== 'day') return '';
+                    const total = this.filteredTotalMinutes;
+                    if (total < 30) return 'yellow';
+                    if (total >= 30 && total <= 90) return 'green';
+                    return 'red';
+                },
+                dayStickerLabel() {
+                    if (this.filterType !== 'day') return '';
+                    const total = this.filteredTotalMinutes;
+                    if (total < 30) return 'Низкая';
+                    if (total >= 30 && total <= 90) return 'Норма';
+                    return 'Высокая';
+                }
+            },
+            methods: {
+                today() {
+                    return new Date().toISOString().slice(0, 10);
+                },
+                // ----- Уведомления -----
+                addNotification(text, type = 'error') {
+                    // Если уже есть такое же уведомление (по тексту) – не дублируем
+                    if (this.notifications.some(n => n.text === text)) return;
+                    const notification = {
+                        text,
+                        type,
+                        blink: true,
+                    };
+                    this.notifications.push(notification);
+                    // Через 3 секунды убираем мигание
+                    setTimeout(() => {
+                        const idx = this.notifications.indexOf(notification);
+                        if (idx !== -1) {
+                            this.notifications[idx].blink = false;
+                        }
+                    }, 3000);
+                },
+                removeNotification(index) {
+                    this.notifications.splice(index, 1);
+                },
+                clearNotifications() {
+                    this.notifications = [];
+                },
+
+                // ----- API запросы -----
+                async request(method, url, data = null) {
+                    try {
+                        const resp = await axios({ method, url, data });
+                        return resp.data;
+                    } catch (err) {
+                        const msg = err.response?.data?.title || err.response?.data || err.message || 'Ошибка запроса';
+                        this.addNotification(msg, 'error');
+                        throw err;
+                    }
+                },
+
+                // ----- Программы -----
+                async loadPrograms() {
+                    this.programs = await this.request('get', '/api/trainingprograms');
+                },
+                async addProgram() {
+                    if (!this.newProgram.name || !this.newProgram.type) {
+                        this.addNotification('Заполните название и тип программы', 'warning');
+                        return;
+                    }
+                    await this.request('post', '/api/trainingprograms', this.newProgram);
+                    this.newProgram = { name: '', type: '', isActive: true };
+                    this.loadPrograms();
+                    this.clearNotifications();
+                },
+                async deleteProgram(id) {
+                    if (!confirm('Удалить программу?')) return;
+                    await this.request('delete', `/api/trainingprograms/${id}`);
+                    this.loadPrograms();
+                    this.loadExercises();
+                    this.clearNotifications();
+                },
+                startEditProgram(p) {
+                    this.editProgram = { ...p };
+                    this.editingProgram = true;
+                    this.clearNotifications();
+                },
+                async saveEditProgram() {
+                    if (!this.editProgram.name || !this.editProgram.type) {
+                        this.addNotification('Заполните название и тип', 'warning');
+                        return;
+                    }
+                    await this.request('put', `/api/trainingprograms/${this.editProgram.id}`, {
+                        name: this.editProgram.name,
+                        type: this.editProgram.type,
+                        isActive: this.editProgram.isActive
+                    });
+                    this.editingProgram = false;
+                    this.loadPrograms();
+                    this.clearNotifications();
+                },
+                cancelEditProgram() {
+                    this.editingProgram = false;
+                    this.clearNotifications();
+                },
+
+                // ----- Упражнения -----
+                async loadExercises() {
+                    this.exercises = await this.request('get', '/api/exercises');
+                },
+                async addExercise() {
+                    if (!this.newExercise.name) {
+                        this.addNotification('Введите название упражнения', 'warning');
+                        return;
+                    }
+                    if (!this.programs.find(p => p.id === this.newExercise.programId)) {
+                        this.addNotification('Выберите существующую программу', 'warning');
+                        return;
+                    }
+                    await this.request('post', '/api/exercises', this.newExercise);
+                    this.newExercise = { name: '', programId: this.programs[0]?.id || 1, isActive: true };
+                    this.loadExercises();
+                    this.clearNotifications();
+                },
+                async deleteExercise(id) {
+                    if (!confirm('Удалить упражнение?')) return;
+                    await this.request('delete', `/api/exercises/${id}`);
+                    this.loadExercises();
+                    this.clearNotifications();
+                },
+                startEditExercise(e) {
+                    this.editExercise = { ...e };
+                    this.editingExercise = true;
+                    this.clearNotifications();
+                },
+                async saveEditExercise() {
+                    if (!this.editExercise.name) {
+                        this.addNotification('Введите название упражнения', 'warning');
+                        return;
+                    }
+                    if (!this.programs.find(p => p.id === this.editExercise.programId)) {
+                        this.addNotification('Выберите существующую программу', 'warning');
+                        return;
+                    }
+                    await this.request('put', `/api/exercises/${this.editExercise.id}`, {
+                        name: this.editExercise.name,
+                        programId: this.editExercise.programId,
+                        isActive: this.editExercise.isActive
+                    });
+                    this.editingExercise = false;
+                    this.loadExercises();
+                    this.clearNotifications();
+                },
+                cancelEditExercise() {
+                    this.editingExercise = false;
+                    this.clearNotifications();
+                },
+                getProgramName(programId) {
+                    const p = this.programs.find(p => p.id === programId);
+                    return p ? p.name : '❌ Удалена';
+                },
+
+                // ----- Активности -----
+                async loadActivities() {
+                    this.activities = await this.request('get', '/api/activities');
+                },
+                async addActivity() {
+                    const ex = this.exercises.find(e => e.id === this.newActivity.exerciseId);
+                    if (!ex || !ex.isActive) {
+                        this.addNotification('Выберите активное упражнение', 'warning');
+                        return;
+                    }
+                    const day = this.newActivity.date;
+                    const currentDayTotal = this.activities.filter(a => a.date.substring(0, 10) === day).reduce((s, a) => s + a.minutes, 0);
+                    if (currentDayTotal + this.newActivity.minutes > 1440) {
+                        this.addNotification('Превышение лимита 1440 минут в день', 'error');
+                        return;
+                    }
+                    await this.request('post', '/api/activities', {
+                        exerciseId: this.newActivity.exerciseId,
+                        date: this.newActivity.date,
+                        minutes: this.newActivity.minutes,
+                        notes: this.newActivity.notes,
+                    });
+                    this.newActivity = { ...this.newActivity, minutes: 30, notes: '' };
+                    this.loadActivities();
+                    this.clearNotifications();
+                },
+                async deleteActivity(id) {
+                    if (!confirm('Удалить активность?')) return;
+                    await this.request('delete', `/api/activities/${id}`);
+                    this.loadActivities();
+                    this.clearNotifications();
+                },
+                startEditActivity(a) {
+                    const ex = this.exercises.find(e => e.id === a.exerciseId);
+                    if (ex && !ex.isActive) {
+                        this.addNotification('Нельзя редактировать активность с неактивным упражнением.', 'error');
+                        return;
+                    }
+                    this.clearNotifications();
+                    this.editActivity = {
+                        ...a,
+                        date: a.date.substring(0, 10)
+                    };
+                    this.editingActivity = true;
+                },
+                async saveEditActivity() {
+                    if (!this.editActivity.exerciseId) {
+                        this.addNotification('Выберите упражнение', 'warning');
+                        return;
+                    }
+                    if (this.editActivity.minutes < 1 || this.editActivity.minutes > 1440) {
+                        this.addNotification('Минуты должны быть от 1 до 1440', 'warning');
+                        return;
+                    }
+                    const day = this.editActivity.date;
+                    const sumWithout = this.activities
+                        .filter(a => a.id !== this.editActivity.id && a.date.substring(0, 10) === day)
+                        .reduce((s, a) => s + a.minutes, 0);
+                    if (sumWithout + this.editActivity.minutes > 1440) {
+                        this.addNotification('Превышение лимита 1440 минут в этот день', 'error');
+                        return;
+                    }
+                    await this.request('put', `/api/activities/${this.editActivity.id}`, {
+                        exerciseId: this.editActivity.exerciseId,
+                        date: this.editActivity.date,
+                        minutes: this.editActivity.minutes,
+                        notes: this.editActivity.notes,
+                    });
+                    this.editingActivity = false;
+                    this.loadActivities();
+                    this.clearNotifications();
+                },
+                cancelEditActivity() {
+                    this.editingActivity = false;
+                    this.clearNotifications();
+                },
+                getExerciseName(exerciseId) {
+                    const e = this.exercises.find(e => e.id === exerciseId);
+                    return e ? e.name : '❌ Удалено';
+                },
+                formatDate(dateStr) {
+                    const dateOnly = dateStr.substring(0, 10);
+                    const parts = dateOnly.split('-');
+                    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+                }
+            },
+            mounted() {
+                this.loadPrograms().then(() => {
+                    this.loadExercises();
+                    this.loadActivities();
+                });
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
