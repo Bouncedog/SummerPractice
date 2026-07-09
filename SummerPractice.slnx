@@ -1,25 +1,37 @@
 <Solution>
-  <Folder Name="/DataBasesTask1/">
+  <Folder Name="/1.DataTypesTask1/">
+    <Project Path="DataTypesTask1/DataTypesTask1.csproj" />
+  </Folder>
+  <Folder Name="/2.DataTypesTask2/">
+    <Project Path="DataTypesTask2/DataTypesTask2.csproj" Id="db60504d-802f-4432-b50a-f26419860c6c" />
+  </Folder>
+  <Folder Name="/3.ObjectOrientedProgrammingTask/">
+    <Project Path="ObjectOrientedProgrammingTask1/ObjectOrientedProgrammingTask1.csproj" Id="0ae206be-f4b4-4c63-bea7-51055d3e22da" />
+  </Folder>
+  <Folder Name="/4.СollectionsTask/">
+    <Project Path="СollectionsTask1/СollectionsTask1.csproj" Id="2d7090a6-1c1d-490a-97e0-862ed2f5626a" />
+  </Folder>
+  <Folder Name="/5.DataBasesTask/">
     <File Path="DataBasesTask1/1)ВыборкаФильтрация.txt" />
     <File Path="DataBasesTask1/2)УдалениеИзменение.txt" />
     <File Path="DataBasesTask1/3)ВыборкаГруппировка.txt" />
     <File Path="DataBasesTask1/4)ВыборкаСвязанныеТаблицы.txt" />
     <File Path="DataBasesTask1/TestDB.bak" />
   </Folder>
-  <Folder Name="/TrainingAppGuide/">
+  <Folder Name="/6.CRUDrequestsTask/">
+    <Project Path="CRUDrequests/CRUDrequestsTask1.csproj" Id="20c2bff9-981d-4f04-b8e2-2a47c29fb84e" />
+  </Folder>
+  <Folder Name="/7.FinalTask/">
+    <Project Path="TrainingApp/TrainingApp.csproj" Id="8135e420-6ec3-4a4d-9822-ed12a9afce44" />
+  </Folder>
+  <Folder Name="/7.FinalTask/TrainingAppGuide/">
     <File Path="TrainingAppGuide/ПРОЧИТАТЬ!!!.txt" />
   </Folder>
-  <Folder Name="/TrainingAppPostman/">
+  <Folder Name="/7.FinalTask/TrainingAppPostman/">
     <File Path="TrainingAppPostman/Delete.png" />
     <File Path="TrainingAppPostman/Get1.png" />
     <File Path="TrainingAppPostman/Get2.png" />
     <File Path="TrainingAppPostman/Get3.png" />
     <File Path="TrainingAppPostman/Post.png" />
   </Folder>
-  <Project Path="CRUDrequests/CRUDrequestsTask1.csproj" Id="20c2bff9-981d-4f04-b8e2-2a47c29fb84e" />
-  <Project Path="DataTypesTask1/DataTypesTask1.csproj" />
-  <Project Path="DataTypesTask2/DataTypesTask2.csproj" Id="db60504d-802f-4432-b50a-f26419860c6c" />
-  <Project Path="ObjectOrientedProgrammingTask1/ObjectOrientedProgrammingTask1.csproj" Id="0ae206be-f4b4-4c63-bea7-51055d3e22da" />
-  <Project Path="TrainingApp/TrainingApp.csproj" Id="8135e420-6ec3-4a4d-9822-ed12a9afce44" />
-  <Project Path="СollectionsTask1/СollectionsTask1.csproj" Id="2d7090a6-1c1d-490a-97e0-862ed2f5626a" />
 </Solution>
