@@ -39,7 +39,6 @@
             color: #0b1a33;
         }
 
-        /* Уведомления */
         .notifications {
             position: fixed;
             top: 20px;
@@ -99,7 +98,6 @@
                     color: #1e293b;
                 }
 
-        /* Мигание */
         @keyframes blink {
             0% {
                 opacity: 1;
@@ -458,7 +456,6 @@
 </head>
 <body>
     <div id="app">
-        <!-- Блок уведомлений -->
         <div class="notifications">
             <div v-for="(n, idx) in notifications" :key="idx"
                  class="notification" :class="[n.type, n.blink ? 'blink' : '']">
@@ -476,7 +473,6 @@
                 <button :class="{ active: tab === 'activities' }" @click="tab='activities'">Активности</button>
             </div>
 
-            <!-- ===================== ПРОГРАММЫ ===================== -->
             <div v-show="tab === 'programs'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Добавить программу</div>
@@ -504,7 +500,6 @@
                     </tbody>
                 </table>
 
-                <!-- Форма редактирования программы -->
                 <div v-if="editingProgram" class="edit-panel">
                     <div class="card-title">Редактирование программы</div>
                     <div class="flex-row">
@@ -517,7 +512,6 @@
                 </div>
             </div>
 
-            <!-- ===================== УПРАЖНЕНИЯ ===================== -->
             <div v-show="tab === 'exercises'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Добавить упражнение</div>
@@ -529,6 +523,14 @@
                         <label><input type="checkbox" v-model="newExercise.isActive"> Активно</label>
                         <button @click="addExercise">Добавить</button>
                     </div>
+                </div>
+
+                <div class="filter-section" style="margin-bottom: 16px;">
+                    <label>Фильтр по программе:</label>
+                    <select v-model="exerciseFilterProgramId" @change="loadExercises">
+                        <option :value="null">Все программы</option>
+                        <option v-for="p in programs" :value="p.id">{{ p.name }}</option>
+                    </select>
                 </div>
 
                 <table>
@@ -547,7 +549,6 @@
                     </tbody>
                 </table>
 
-                <!-- Форма редактирования упражнения -->
                 <div v-if="editingExercise" class="edit-panel">
                     <div class="card-title">Редактирование упражнения</div>
                     <div class="flex-row">
@@ -562,7 +563,6 @@
                 </div>
             </div>
 
-            <!-- ===================== АКТИВНОСТИ ===================== -->
             <div v-show="tab === 'activities'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Записать активность</div>
@@ -577,7 +577,6 @@
                     </div>
                 </div>
 
-                <!-- Фильтры -->
                 <div class="filter-section">
                     <label>Показать за:</label>
                     <button class="info" @click="filterType='all'">Всё время</button>
@@ -611,7 +610,6 @@
                     </tbody>
                 </table>
 
-                <!-- Форма редактирования активности -->
                 <div v-if="editingActivity" class="edit-panel">
                     <div class="card-title">Редактирование активности</div>
                     <div class="flex-row">
@@ -624,14 +622,12 @@
                         <button @click="saveEditActivity">Сохранить</button>
                         <button class="secondary" @click="cancelEditActivity">Отмена</button>
                     </div>
-                    <!-- Ошибка теперь отображается как уведомление, поэтому здесь не нужно -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Генерация или получение userId из localStorage
         function getUserId() {
             let userId = localStorage.getItem('userId');
             if (!userId) {
@@ -643,7 +639,6 @@
 
         const userId = getUserId();
 
-        // Устанавливаем заголовок для всех запросов axios
         axios.defaults.headers.common['X-UserId'] = userId;
 
         const { createApp } = Vue;
@@ -662,9 +657,10 @@
                     filterDate: this.today(),
                     filterMonthYear: new Date().getFullYear(),
                     filterMonth: new Date().getMonth() + 1,
-                    // Уведомления
+
+                    exerciseFilterProgramId: null,
+
                     notifications: [],
-                    // Редактирование
                     editingProgram: false,
                     editProgram: { id: null, name: '', type: '', isActive: true },
                     editingExercise: false,
@@ -710,9 +706,8 @@
                 today() {
                     return new Date().toISOString().slice(0, 10);
                 },
-                // ----- Уведомления -----
+
                 addNotification(text, type = 'error') {
-                    // Если уже есть такое же уведомление (по тексту) – не дублируем
                     if (this.notifications.some(n => n.text === text)) return;
                     const notification = {
                         text,
@@ -720,7 +715,6 @@
                         blink: true,
                     };
                     this.notifications.push(notification);
-                    // Через 3 секунды убираем мигание
                     setTimeout(() => {
                         const idx = this.notifications.indexOf(notification);
                         if (idx !== -1) {
@@ -735,7 +729,6 @@
                     this.notifications = [];
                 },
 
-                // ----- API запросы -----
                 async request(method, url, data = null) {
                     try {
                         const resp = await axios({ method, url, data });
@@ -747,7 +740,6 @@
                     }
                 },
 
-                // ----- Программы -----
                 async loadPrograms() {
                     this.programs = await this.request('get', '/api/trainingprograms');
                 },
@@ -792,10 +784,14 @@
                     this.clearNotifications();
                 },
 
-                // ----- Упражнения -----
                 async loadExercises() {
-                    this.exercises = await this.request('get', '/api/exercises');
+                    let url = '/api/exercises';
+                    if (this.exerciseFilterProgramId !== null) {
+                        url += `?programId=${this.exerciseFilterProgramId}`;
+                    }
+                    this.exercises = await this.request('get', url);
                 },
+
                 async addExercise() {
                     if (!this.newExercise.name) {
                         this.addNotification('Введите название упражнения', 'warning');
@@ -848,7 +844,6 @@
                     return p ? p.name : '❌ Удалена';
                 },
 
-                // ----- Активности -----
                 async loadActivities() {
                     this.activities = await this.request('get', '/api/activities');
                 },
