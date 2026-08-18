@@ -13,7 +13,10 @@ public class AdoEmployeeRepository
         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
     }
 
-    // CREATE
+    /// <summary>
+    /// Создаёт работника.
+    /// </summary>
+    /// <param name="employee">работник.</param>
     public void Create(Employee employee)
     {
         const string sql = @"
@@ -32,7 +35,9 @@ public class AdoEmployeeRepository
         command.ExecuteNonQuery();
     }
 
-    // READ: все
+    /// <summary>
+    /// Получает список всех имеющихся работников.
+    /// </summary>
     public List<Employee> GetAll()
     {
         const string sql = @"
@@ -64,7 +69,10 @@ public class AdoEmployeeRepository
         return result;
     }
 
-    // UPDATE
+    /// <summary>
+    /// Обновляет информацию об работнике.
+    /// </summary>
+    /// <param name="employee">работник.</param>
     public void Update(Employee employee)
     {
         const string sql = @"
@@ -88,7 +96,10 @@ public class AdoEmployeeRepository
         command.ExecuteNonQuery();
     }
 
-    // DELETE
+    /// <summary>
+    /// Удаляет работника по ID.
+    /// </summary>
+    /// <param name="id"> id работника.</param>
     public void Delete(int id)
     {
         const string sql = @"DELETE FROM Employees WHERE Id = @Id;";

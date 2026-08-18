@@ -14,19 +14,19 @@ internal class ObjectOrientedProgrammingTask1
     /// <param name="productionDate">дата производства.</param>
     public class Product(string name, string manufacturer, double price, int storageLifeInDays, DateTime productionDate)
     {
-        private string _name = name;
-        private string _manufacturer = manufacturer;
-        private double _price = price;
-        private int _storageLifeInDays = storageLifeInDays;
-        private DateTime _productionDate = productionDate;
+        public string Name { get; } = name;
+        public string Manufacturer { get; } = manufacturer;
+        public double Price { get; } = price;
+        public int StorageLifeInDays { get; } = storageLifeInDays;
+        public DateTime ProductionDate { get; } = productionDate;
 
         public override string ToString()
         {
-            return $"Наименование: {_name}\n" +
-                   $"Производитель: {_manufacturer}\n" +
-                   $"Цена: {_price:F2} руб.\n" +
-                   $"Срок годности: {_storageLifeInDays} дней\n" +
-                   $"Дата производства: {_productionDate:dd.MM.yyyy}";
+            return $"Наименование: {Name}\n" +
+                   $"Производитель: {Manufacturer}\n" +
+                   $"Цена: {Price:F2} руб.\n" +
+                   $"Срок годности: {StorageLifeInDays} дней\n" +
+                   $"Дата производства: {ProductionDate:dd.MM.yyyy}";
         }
     }
 

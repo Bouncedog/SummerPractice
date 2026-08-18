@@ -7,14 +7,19 @@ internal class СollectionsTask1
     public class SmartStack<T> : IEnumerable<T>
     {
         private T[] _array;
+
+        //9
         private int _count; //Количество элементов в стеке.
 
         public int Count => _count;
+
+        //10
         public int Capacity => _array.Length; //Длина внутреннего массива.
 
-
+        //1
         public SmartStack() : this(4) { }
 
+        //2
         public SmartStack(int capacity)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(capacity);
@@ -23,21 +28,21 @@ internal class СollectionsTask1
             _count = 0;
         }
 
+        //3
         public SmartStack(IEnumerable<T> collection)
         {
-            if (!collection.Any())
-                throw new ArgumentNullException(nameof(collection));
-
             _count = collection.Count();
             _array = new T[_count];
 
             int index = 0;
+
             foreach (var element in collection)
             {
                 _array[index++] = element;
             }
         }
 
+        //4
         /// <summary>
         /// Добавляет элемент на вершину стека. (При нехватке места для добавления элемента, ёмкость массива удваивается).
         /// </summary>
@@ -54,20 +59,18 @@ internal class СollectionsTask1
             _array[_count++] = item;
         }
 
+        //5
         /// <summary>
         /// Добавляет на вершину стека содержимое коллекции, реализующей интерфейс <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <param name="collection">коллекция, реализующая интерфейс <see cref="IEnumerable{T}"/>.</param>
         public void PushRange(IEnumerable<T> collection)
         {
-            var collectionArray = collection.ToArray();
-
-            for (int i = collectionArray.Length - 1; i >= 0; i--)
-            {
-                Push(collectionArray[i]);
-            }
+            foreach (var item in collection)
+                Push(item);
         }
 
+        //6
         /// <summary>
         /// Удаляет и возвращает элемент с вершины стека. (Реальная ёмкость массива не уменьшаться при удалении).
         /// </summary>
@@ -77,12 +80,12 @@ internal class СollectionsTask1
                 throw new InvalidOperationException("Стек пуст");
 
             T item = _array[_count - 1];
-            _array[_count - 1] = default!; //Очистка ссылки для больших объектов (на всякий случай сделал)
             _count--;
 
             return item;
         }
 
+        //7
         /// <summary>
         /// Возвращает элемент с вершины стека без его удаления.
         /// </summary>
@@ -94,17 +97,19 @@ internal class СollectionsTask1
             return _array[_count - 1];
         }
 
+        //8
         public bool Contains(T item)
         {
             for (int i = _count - 1; i >= 0; i--)
             {
-                if (item!.Equals(_array[i]))
-                    return true;
+                if (Equals(item, _array[i]))
+            return true;
             }
 
             return false;
         }
 
+        //11
         public IEnumerator<T> GetEnumerator()
         {
             for (int i = _count - 1; i >= 0; i--)
@@ -116,6 +121,7 @@ internal class СollectionsTask1
             return GetEnumerator();
         }
 
+        //12
         /// <summary>
         /// Индексатор, позволяющий работать с элементом по глубине (0 - вершина стека, _count - 1 - index - основание).
         /// </summary>
@@ -123,7 +129,7 @@ internal class СollectionsTask1
         {
             get
             {
-                if (index < 0 || index >= Capacity)
+                if (index < 0 || index >= Count)
                     throw new ArgumentOutOfRangeException(nameof(index));
 
                 return _array[_count - 1 - index];
@@ -135,7 +141,7 @@ internal class СollectionsTask1
     {
         //1.
         string text = "Пустой стек";
-        Console.WriteLine("1.");
+        Console.WriteLine("1. Работа с пустым стеком");
         Console.WriteLine($"========{text}========");
 
         SmartStack<int> testEmpty = new();
@@ -149,10 +155,10 @@ internal class СollectionsTask1
 
         //2.
         text = "Объявление стека через массив";
-        Console.WriteLine("2.");
+        Console.WriteLine("2. Работа с объявлением стека через массив");
         Console.WriteLine($"========{text}========\n");
 
-        int[] arrayInt = [1, 2, 3, 4, 5, 6, 7];
+        int[] arrayInt = [7, 6, 5, 4, 3, 2, 1];
 
         Console.WriteLine($"Иммеющийся массив для копирования [{string.Join(", ", arrayInt)}]");
 
@@ -160,6 +166,7 @@ internal class СollectionsTask1
         Console.WriteLine($"\nСтек после объявления при помощи массива:");
         foreach (var item in testCopy)
             Console.WriteLine(item);
+        Console.WriteLine("Дно стека");
 
         Console.WriteLine($"\nВ нынешнем стеке количество элементов равно: {testCopy.Count}");
         Console.WriteLine($"В нынешнем стеке длина внутреннего массива равна: {testCopy.Capacity}");
@@ -168,7 +175,7 @@ internal class СollectionsTask1
 
         //3.
         text = "Пустой массив int длинной 5";
-        Console.WriteLine("3.");
+        Console.WriteLine("3. Работа с пустым массивом");
         Console.WriteLine($"========{text}========\n");
 
         SmartStack<int> testNumber = new(5);
@@ -183,6 +190,7 @@ internal class СollectionsTask1
         Console.WriteLine($"\nСтек после Push-a:");
         foreach (var item in testNumber)
             Console.WriteLine(item);
+        Console.WriteLine("Дно стека");
 
         Console.WriteLine($"\nПроведём Push чисел массива [{string.Join(", ", arrayInt)}]");
         testNumber.PushRange(arrayInt);
@@ -192,6 +200,7 @@ internal class СollectionsTask1
         {
             Console.WriteLine(item);
         }
+        Console.WriteLine("Дно стека");
 
         Console.WriteLine($"\nВ нынешнем стеке количество элементов равно: {testNumber.Count}");
         Console.WriteLine($"В нынешнем стеке длина внутреннего массива равна: {testNumber.Capacity}");
@@ -205,6 +214,7 @@ internal class СollectionsTask1
         {
             Console.WriteLine(item);
         }
+        Console.WriteLine("Дно стека");
 
         int checkNumber = 1;
         Console.WriteLine($"\nПроверим существует ли в стеке {checkNumber}: {testNumber.Contains(checkNumber)}");

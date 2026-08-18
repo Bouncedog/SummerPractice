@@ -11,27 +11,38 @@ public class EfEmployeeRepository
         _context = context;
     }
 
-    // CREATE
+    /// <summary>
+    /// Создаёт работника.
+    /// </summary>
+    /// <param name="employee">работник.</param>
     public void Create(Employee employee)
     {
         _context.Employees.Add(employee);
         _context.SaveChanges();
     }
 
-    // READ: все
+    /// <summary>
+    /// Получает список всех имеющихся работников.
+    /// </summary>
     public List<Employee> GetAll()
     {
         return _context.Employees.ToList();
     }
 
-    // UPDATE
+    /// <summary>
+    /// Обновляет информацию об работнике.
+    /// </summary>
+    /// <param name="employee">работник.</param>
     public void Update(Employee employee)
     {
         _context.Employees.Update(employee);
         _context.SaveChanges();
     }
 
-    // DELETE
+    /// <summary>
+    /// Удаляет работника по ID.
+    /// </summary>
+    /// <param name="id"> id работника.</param>
     public void Delete(int id)
     {
         var emp = _context.Employees.Find(id);

@@ -24,7 +24,7 @@ internal class DataTypesTask1
 
         if (years == 0)
         {
-            throw new ArgumentException("Количество лет должно быть положительным целым числом");
+            throw new ArgumentException("Количество лет должно быть больше нуля");
         }
 
         StringBuilder result = new();

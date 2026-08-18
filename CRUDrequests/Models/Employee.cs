@@ -1,10 +1,10 @@
-﻿namespace CRUDrequestsTask1.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CRUDrequestsTask1.Models;
 
 public class Employee
 {
-    /// <summary>
-    /// Primary key
-    /// </summary>
+    [Key]
     public int Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }

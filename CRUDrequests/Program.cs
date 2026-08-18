@@ -1,11 +1,23 @@
 ﻿using CRUDrequestsTask1.Data;
-using CRUDrequestsTask1.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using CRUDrequestsTask1.Services;
 
 namespace CRUDrequestsTask1;
 
 internal class Program
 {
+    public static void InterfaceCRUD()
+    {
+        Console.WriteLine("\nОперация:");
+        Console.WriteLine("1. Create");
+        Console.WriteLine("2. Read all");
+        Console.WriteLine("3. Update");
+        Console.WriteLine("4. Delete");
+        Console.WriteLine("5. Back");
+        Console.Write("--> ");
+    }
+
     static void Main(string[] args)
     {
         var configuration = new ConfigurationBuilder()
@@ -13,10 +25,16 @@ internal class Program
             .AddJsonFile("appsettings.json")
             .Build();
 
-        string connectionString = configuration.GetConnectionString("DefaultConnection");
+        string connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException(
+                "Строка подключения DefaultConnection не найдена.");
 
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+    .UseSqlServer(connectionString)
+    .Options;
+
+        using var efContext = new ApplicationDbContext(options);
         var adoRepo = new AdoEmployeeRepository(connectionString);
-        var efContext = new ApplicationDbContext();
         var efRepo = new EfEmployeeRepository(efContext);
 
         while (true)
@@ -31,114 +49,99 @@ internal class Program
             if (mode == "3")
                 break;
 
-            Console.WriteLine("\nОперация:");
-            Console.WriteLine("1. Create");
-            Console.WriteLine("2. Read all");
-            Console.WriteLine("3. Update");
-            Console.WriteLine("4. Delete");
-            Console.WriteLine("5. Back");
-            Console.Write("--> ");
-            string action = Console.ReadLine();
-
             if (mode == "1")
             {
-                DoAdo(action, adoRepo);
+                DoAdo(adoRepo);
+                Console.WriteLine();
             }
             else if (mode == "2")
             {
-                DoEf(action, efRepo);
+                DoEf(efRepo);
+                Console.WriteLine();
             }
-
-            Console.WriteLine();
-        }
-
-        static Employee ReadEmployee()
-        {
-            Console.Write("FirstName: ");
-            string firstName = Console.ReadLine();
-
-            Console.Write("LastName: ");
-            string lastName = Console.ReadLine();
-
-            Console.Write("Email: ");
-            string email = Console.ReadLine();
-
-            Console.Write("Salary: ");
-            decimal salary = decimal.Parse(Console.ReadLine());
-
-            return new Employee
+            else
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email,
-                Salary = salary
-            };
+                Console.WriteLine("Неверный режим.");
+                Console.WriteLine();
+            }
         }
 
-        static void DoAdo(string action, AdoEmployeeRepository repo)
+        static void DoAdo(AdoEmployeeRepository repo)
         {
+            InterfaceCRUD();
+
+            string action = Console.ReadLine();
+            Console.WriteLine();
+
             switch (action)
             {
                 case "1":
-                    repo.Create(ReadEmployee());
+                    repo.Create(ServicesConsole.CreateEmployee());
+
                     Console.WriteLine("Создано при помощи ADO.NET");
                     break;
 
                 case "2":
                     foreach (var e in repo.GetAll())
-                        Console.WriteLine($"{e.Id}: {e.FirstName} {e.LastName} {e.Email} {e.Salary}");
+                        Console.WriteLine($"{e.Id}: {e.FirstName} {e.LastName} {e.Email} {e.Salary:F2}");
                     break;
 
                 case "3":
-                    var upd = ReadEmployee();
-                    Console.Write("Id: ");
-                    upd.Id = int.Parse(Console.ReadLine());
-                    repo.Update(upd);
+                    repo.Update(ServicesConsole.UpdateEmployee(ServicesConsole.ReadId()));
+
                     Console.WriteLine("Обновлено при помощи ADO.NET");
                     break;
 
                 case "4":
-                    Console.Write("Id: ");
-                    int id = int.Parse(Console.ReadLine());
-                    repo.Delete(id);
+                    repo.Delete(ServicesConsole.ReadId());
                     Console.WriteLine("Удалено при помощи ADO.NET");
                     break;
 
                 case "5":
                     break;
+
+                default:
+                    Console.WriteLine("Неверная операция.");
+                    break;
             }
         }
 
-        static void DoEf(string action, EfEmployeeRepository repo)
+        static void DoEf(EfEmployeeRepository repo)
         {
+            InterfaceCRUD();
+
+            string action = Console.ReadLine();
+            Console.WriteLine();
+
             switch (action)
             {
                 case "1":
-                    repo.Create(ReadEmployee());
+                    repo.Create(ServicesConsole.CreateEmployee());
                     Console.WriteLine("Создано при помощи EF");
                     break;
 
                 case "2":
                     foreach (var e in repo.GetAll())
-                        Console.WriteLine($"{e.Id}: {e.FirstName} {e.LastName} {e.Email} {e.Salary}");
+                        Console.WriteLine($"{e.Id}: {e.FirstName} {e.LastName} {e.Email} {e.Salary:F2}");
                     break;
 
                 case "3":
-                    var upd = ReadEmployee();
-                    Console.Write("Id: ");
-                    upd.Id = int.Parse(Console.ReadLine());
-                    repo.Update(upd);
+                    repo.Update(ServicesConsole.UpdateEmployee(ServicesConsole.ReadId()));
                     Console.WriteLine("Обновлено при помощи EF");
                     break;
 
                 case "4":
-                    Console.Write("Id: ");
-                    int id = int.Parse(Console.ReadLine());
-                    repo.Delete(id);
+                    repo.Delete(ServicesConsole.ReadId());
                     Console.WriteLine("Удалено при помощи EF");
+                    break;
+
+                case "5":
+                    break;
+
+                default:
+                    Console.WriteLine("Неверная операция.");
                     break;
             }
         }
-
     }
 }
