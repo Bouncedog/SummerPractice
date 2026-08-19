@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TrainingApp.Data;
@@ -6,75 +8,79 @@ using TrainingApp.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.ReferenceHandler =
+            ReferenceHandler.IgnoreCycles;
+
+        options.JsonSerializerOptions.DefaultIgnoreCondition =
+            JsonIgnoreCondition.WhenWritingNull;
+
+        options.JsonSerializerOptions.PropertyNamingPolicy =
+            JsonNamingPolicy.CamelCase;
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile =
+        $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    options.IncludeXmlComments(xmlPath);
+
+    options.AddSecurityDefinition("UserId", new OpenApiSecurityScheme
+    {
+        Name = "X-UserId",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = """
+        Учебная анонимная идентификация пользователя.
+
+        ID сайта отображается на главной странице под заголовком:
+        «Анонимный пользователь: user-...».
+
+        Скопируйте этот ID «user-...» и вставьте сюда, чтобы Swagger показал
+        те же программы, упражнения и активности, что видны на сайте.
+
+        Для отдельного тестового пользователя можно ввести любое
+        значение, например: student-1.
+        """
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("UserId", document)] = []
+    });
+});
 
 var app = builder.Build();
 
-// Автоматическое применение миграций при запуске. (создание таблиц, если их нет)
+// Создаёт БД при первом запуске и применяет миграции.
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var dbContext =
+        scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
     dbContext.Database.Migrate();
 }
 
-// Включение Swagger и Swagger UI c данными для каждого пользователя Swagger отдельно
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+
+app.UseSwaggerUI(options =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TrainingApp API v1");
-    c.RoutePrefix = "swagger";
+    options.SwaggerEndpoint(
+        "/swagger/v1/swagger.json",
+        "TrainingApp API v1");
 
-    c.HeadContent = @"
-    <script>
-        (function() {
-            function getUserId() {
-                return localStorage.getItem('userId');
-            }
-
-            const originalFetch = window.fetch;
-            window.fetch = function(url, options) {
-                options = options || {};
-                options.headers = options.headers || {};
-                const userId = getUserId();
-                if (userId) {
-                    options.headers['X-UserId'] = userId;
-                } else {
-                    console.warn('UserId не найден в localStorage. Сначала откройте интерфейс, чтобы он создал ID.');
-                }
-                return originalFetch.call(this, url, options);
-            };
-
-            const originalXHROpen = XMLHttpRequest.prototype.open;
-            XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-                this._url = url;
-                return originalXHROpen.apply(this, arguments);
-            };
-            const originalXHRSend = XMLHttpRequest.prototype.send;
-            XMLHttpRequest.prototype.send = function(body) {
-                const userId = getUserId();
-                if (userId) {
-                    this.setRequestHeader('X-UserId', userId);
-                } else {
-                    console.warn('UserId не найден в localStorage. Сначала откройте интерфейс.');
-                }
-                return originalXHRSend.call(this, body);
-            };
-        })();
-    </script>
-    ";
+    options.RoutePrefix = "swagger";
 });
-
 
 app.UseHttpsRedirection();
 

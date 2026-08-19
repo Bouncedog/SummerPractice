@@ -29,6 +29,10 @@ namespace TrainingApp.Controllers
 #endif
         }
 
+        /// <summary>
+        /// Возвращает все активности текущего пользователя.
+        /// Можно передать startDate и endDate для фильтрации по диапазону дат.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ActivityDto>>> GetActivities(
             [FromQuery] DateTime? startDate = null,
@@ -62,6 +66,9 @@ namespace TrainingApp.Controllers
             return Ok(activities);
         }
 
+        /// <summary>
+        /// Возвращает активности и общую длительность за указанный день.
+        /// </summary>
         [HttpGet("day")]
         public async Task<ActionResult<object>> GetDayActivities([FromQuery] DateTime date)
         {
@@ -91,6 +98,9 @@ namespace TrainingApp.Controllers
             });
         }
 
+        /// <summary>
+        /// Возвращает все активности текущего пользователя за указанный месяц.
+        /// </summary>
         [HttpGet("month")]
         public async Task<ActionResult<IEnumerable<ActivityDto>>> GetMonthActivities(
             [FromQuery] int year,
@@ -119,6 +129,9 @@ namespace TrainingApp.Controllers
             return Ok(activities);
         }
 
+        /// <summary>
+        /// Создаёт новую активность для активного упражнения.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ActivityDto>> CreateActivity(CreateActivityDto dto)
         {
@@ -164,6 +177,9 @@ namespace TrainingApp.Controllers
             return CreatedAtAction(nameof(GetActivity), new { id = activity.Id }, result);
         }
 
+        /// <summary>
+        /// Возвращает активность текущего пользователя по идентификатору.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<ActivityDto>> GetActivity(int id)
         {
@@ -186,6 +202,10 @@ namespace TrainingApp.Controllers
             });
         }
 
+        /// <summary>
+        /// Обновляет активность текущего пользователя.
+        /// Если исходное упражнение стало неактивным, изменить упражнение нельзя.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActivity(int id, UpdateActivityDto dto)
         {
@@ -230,6 +250,9 @@ namespace TrainingApp.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Удаляет активность текущего пользователя.
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(int id)
         {

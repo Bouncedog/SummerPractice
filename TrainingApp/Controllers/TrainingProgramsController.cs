@@ -6,6 +6,9 @@ using TrainingApp.Models;
 
 namespace TrainingApp.Controllers
 {
+    /// <summary>
+    /// Возвращает список тренировочных программ текущего пользователя.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TrainingProgramsController : ControllerBase
@@ -29,6 +32,9 @@ namespace TrainingApp.Controllers
 #endif
         }
 
+        /// <summary>
+        /// Возвращает список тренировочных программ текущего пользователя.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TrainingProgramDto>>> GetPrograms()
         {
@@ -47,6 +53,9 @@ namespace TrainingApp.Controllers
             return Ok(programs);
         }
 
+        /// <summary>
+        /// Возвращает тренировочную программу текущего пользователя по идентификатору.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<TrainingProgramDto>> GetProgram(int id)
         {
@@ -66,6 +75,9 @@ namespace TrainingApp.Controllers
             });
         }
 
+        /// <summary>
+        /// Создаёт новую тренировочную программу.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<TrainingProgramDto>> CreateProgram(CreateTrainingProgramDto dto)
         {
@@ -92,6 +104,9 @@ namespace TrainingApp.Controllers
             return CreatedAtAction(nameof(GetProgram), new { id = program.Id }, result);
         }
 
+        /// <summary>
+        /// Обновляет тренировочную программу текущего пользователя.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProgram(int id, CreateTrainingProgramDto dto)
         {
@@ -111,15 +126,29 @@ namespace TrainingApp.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Удаляет тренировочную программу текущего пользователя.
+        /// Нельзя удалить программу, если в ней есть упражнения.
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProgram(int id)
         {
             var userId = GetUserId();
+
             var program = await _context.TrainingPrograms
                 .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
 
             if (program == null)
                 return NotFound();
+
+            var hasExercises = await _context.Exercises
+                .AnyAsync(e => e.ProgramId == id && e.UserId == userId);
+
+            if (hasExercises)
+            {
+                return BadRequest(
+                    "Нельзя удалить программу, пока в ней есть упражнения.");
+            }
 
             _context.TrainingPrograms.Remove(program);
             await _context.SaveChangesAsync();

@@ -47,7 +47,7 @@ namespace TrainingApp.Data
                 entity.HasOne(e => e.Program)
                     .WithMany(p => p.Exercises)
                     .HasForeignKey(e => e.ProgramId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Activity>(entity =>
@@ -64,7 +64,7 @@ namespace TrainingApp.Data
                 entity.HasOne(a => a.Exercise)
                     .WithMany(e => e.Activities)
                     .HasForeignKey(a => a.ExerciseId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

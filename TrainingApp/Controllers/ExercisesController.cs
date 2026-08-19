@@ -6,6 +6,10 @@ using TrainingApp.Models;
 
 namespace TrainingApp.Controllers
 {
+    /// <summary>
+    /// Возвращает упражнения текущего пользователя.
+    /// Можно фильтровать по программе и признаку активности.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ExercisesController : ControllerBase
@@ -29,6 +33,10 @@ namespace TrainingApp.Controllers
 #endif
         }
 
+        /// <summary>
+        /// Возвращает список упражнений текущего пользователя.
+        /// Можно отфильтровать упражнения по программе и активности.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExerciseDto>>> GetExercises(
             [FromQuery] int? programId = null,
@@ -59,6 +67,9 @@ namespace TrainingApp.Controllers
             return Ok(exercises);
         }
 
+        /// <summary>
+        /// Возвращает упражнение текущего пользователя по идентификатору.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<ExerciseDto>> GetExercise(int id)
         {
@@ -80,6 +91,9 @@ namespace TrainingApp.Controllers
             });
         }
 
+        /// <summary>
+        /// Создаёт новое упражнение в тренировочной программе.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ExerciseDto>> CreateExercise(CreateExerciseDto dto)
         {
@@ -113,6 +127,9 @@ namespace TrainingApp.Controllers
             return CreatedAtAction(nameof(GetExercise), new { id = exercise.Id }, result);
         }
 
+        /// <summary>
+        /// Обновляет упражнение текущего пользователя.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateExercise(int id, CreateExerciseDto dto)
         {
@@ -138,15 +155,29 @@ namespace TrainingApp.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Удаляет упражнение текущего пользователя.
+        /// Нельзя удалить упражнение, если по нему есть активности.
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
             var userId = GetUserId();
+
             var exercise = await _context.Exercises
                 .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
 
             if (exercise == null)
                 return NotFound();
+
+            var hasActivities = await _context.Activities
+                .AnyAsync(a => a.ExerciseId == id && a.UserId == userId);
+
+            if (hasActivities)
+            {
+                return BadRequest(
+                    "Нельзя удалить упражнение, пока для него существуют активности.");
+            }
 
             _context.Exercises.Remove(exercise);
             await _context.SaveChangesAsync();
