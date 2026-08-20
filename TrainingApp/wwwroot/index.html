@@ -579,6 +579,7 @@
         .month-filter {
             display: flex;
             gap: 6px;
+            align-items: center;
         }
 
             .month-filter input[type="number"] {
@@ -654,6 +655,31 @@
             font-weight: 600;
             white-space: nowrap;
         }
+
+        .filter-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+            .filter-buttons button {
+                height: 28px;
+                padding: 0 14px;
+                font-size: 12px;
+                background: var(--surface);
+                color: var(--text-secondary);
+                border: 1px solid var(--border);
+            }
+
+                .filter-buttons button:hover {
+                    background: var(--surface-soft);
+                }
+
+                .filter-buttons button.active {
+                    background: var(--primary);
+                    color: #fff;
+                    border-color: var(--primary);
+                }
 
         @media (max-width: 850px) {
             .dashboard-grid {
@@ -755,7 +781,6 @@
                 </span>
             </div>
 
-            <!-- Панель статистики -->
             <div class="dashboard-grid" v-show="showStats">
                 <div class="stat-card stat-card-primary">
                     <span class="stat-label">Сегодня</span>
@@ -780,18 +805,17 @@
                 <button :class="{ active: tab === 'today' }" @click="tab = 'today'">
                     Сегодня
                 </button>
-                <button :class="{ active: tab === 'activities' }" @click="tab = 'activities'">
-                    Активности
-                </button>
                 <button :class="{ active: tab === 'programs' }" @click="tab = 'programs'">
                     Программы
                 </button>
                 <button :class="{ active: tab === 'exercises' }" @click="tab = 'exercises'">
                     Упражнения
                 </button>
+                <button :class="{ active: tab === 'activities' }" @click="tab = 'activities'">
+                    Активности
+                </button>
             </div>
 
-            <!-- Вкладка Сегодня -->
             <div v-show="tab === 'today'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Активность за сегодня</div>
@@ -824,7 +848,6 @@
                 </div>
             </div>
 
-            <!-- Вкладка Программы -->
             <div v-show="tab === 'programs'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Добавить программу</div>
@@ -904,7 +927,6 @@
                 </div>
             </div>
 
-            <!-- Вкладка Упражнения -->
             <div v-show="tab === 'exercises'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Добавить упражнение</div>
@@ -999,7 +1021,6 @@
                 </div>
             </div>
 
-            <!-- Вкладка Активности -->
             <div v-show="tab === 'activities'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Записать активность</div>
@@ -1032,24 +1053,29 @@
                 <div class="filter-section">
                     <label>Показать за:</label>
 
-                    <button @click="filterType='day'">День</button>
-                    <button @click="filterType='month'">Месяц</button>
-                    <button @click="filterType='all'">Всё время</button>
+                    <div class="filter-buttons">
+                        <button :class="{ active: filterType === 'day' }" @click="filterType = 'day'">День</button>
+                        <button :class="{ active: filterType === 'month' }" @click="filterType = 'month'">Месяц</button>
+                        <button :class="{ active: filterType === 'all' }" @click="filterType = 'all'">Всё время</button>
+                    </div>
 
                     <input v-if="filterType === 'day'"
                            type="date"
                            v-model="filterDate">
 
                     <div v-if="filterType === 'month'" class="month-filter">
-                        <input type="number"
-                               v-model.number="filterMonthYear"
-                               placeholder="Год">
-
+                        <span style="font-size:12px; color:var(--text-secondary); font-weight:500;">Месяц:</span>
                         <input type="number"
                                v-model.number="filterMonth"
-                               placeholder="Месяц"
+                               placeholder="Мес"
                                min="1"
-                               max="12">
+                               max="12"
+                               style="width:60px;">
+                        <span style="font-size:12px; color:var(--text-secondary); font-weight:500;">Год:</span>
+                        <input type="number"
+                               v-model.number="filterMonthYear"
+                               placeholder="Год"
+                               style="width:70px;">
                     </div>
 
                     <div class="total-info">
@@ -1718,7 +1744,7 @@
 
                 getExerciseName(exerciseId) {
                     const e = this.exercises.find(e => e.id === exerciseId);
-                    if (!e) return '❌ Удалено';
+                    if (!e) return `${e.name} (удалено)`;
                     if (e.isDeleted) return `${e.name} (удалено)`;
                     return e.name;
                 },
@@ -1733,7 +1759,6 @@
             },
 
             mounted() {
-                // Загрузка темы
                 const savedTheme = localStorage.getItem('theme');
                 if (savedTheme === 'dark') {
                     this.isDark = true;
