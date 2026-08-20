@@ -26,11 +26,7 @@ namespace TrainingApp.Controllers
             if (Request.Headers.TryGetValue("X-UserId", out var userId))
                 return userId.ToString();
 
-#if DEBUG
-            return "dev-user";
-#else
-    return "default";
-#endif
+            throw new InvalidOperationException("Заголовок X-UserId не найден.");
         }
 
         /// <summary>
@@ -40,12 +36,16 @@ namespace TrainingApp.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExerciseDto>>> GetExercises(
             [FromQuery] int? programId = null,
-            [FromQuery] bool? isActive = null)
+            [FromQuery] bool? isActive = null,
+            [FromQuery] bool? includeDeleted = null)
         {
             var userId = GetUserId();
             var query = _context.Exercises
                 .Include(e => e.Program)
                 .Where(e => e.UserId == userId);
+
+            if (includeDeleted != true)
+                query = query.Where(e => !e.IsDeleted);
 
             if (programId.HasValue)
                 query = query.Where(e => e.ProgramId == programId.Value);
@@ -60,7 +60,8 @@ namespace TrainingApp.Controllers
                     Name = e.Name,
                     ProgramId = e.ProgramId,
                     IsActive = e.IsActive,
-                    ProgramName = e.Program.Name
+                    ProgramName = e.Program.Name,
+                    IsDeleted = e.IsDeleted
                 })
                 .ToListAsync();
 
@@ -76,7 +77,7 @@ namespace TrainingApp.Controllers
             var userId = GetUserId();
             var exercise = await _context.Exercises
                 .Include(e => e.Program)
-                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId && !e.IsDeleted);
 
             if (exercise == null)
                 return NotFound();
@@ -87,7 +88,8 @@ namespace TrainingApp.Controllers
                 Name = exercise.Name,
                 ProgramId = exercise.ProgramId,
                 IsActive = exercise.IsActive,
-                ProgramName = exercise.Program.Name
+                ProgramName = exercise.Program.Name,
+                IsDeleted = exercise.IsDeleted
             });
         }
 
@@ -109,6 +111,7 @@ namespace TrainingApp.Controllers
                 Name = dto.Name,
                 ProgramId = dto.ProgramId,
                 IsActive = dto.IsActive,
+                IsDeleted = false,
                 UserId = userId
             };
 
@@ -136,7 +139,7 @@ namespace TrainingApp.Controllers
             var userId = GetUserId();
             var exercise = await _context.Exercises
                 .Include(e => e.Program)
-                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId && !e.IsDeleted);  // ←
 
             if (exercise == null)
                 return NotFound();
@@ -156,8 +159,8 @@ namespace TrainingApp.Controllers
         }
 
         /// <summary>
-        /// Удаляет упражнение текущего пользователя.
-        /// Нельзя удалить упражнение, если по нему есть активности.
+        /// Помечает упражнение текущего пользователя как удалённое (архив).
+        /// Упражнение скрывается из списков, но история активностей сохраняется.
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
@@ -170,16 +173,9 @@ namespace TrainingApp.Controllers
             if (exercise == null)
                 return NotFound();
 
-            var hasActivities = await _context.Activities
-                .AnyAsync(a => a.ExerciseId == id && a.UserId == userId);
+            exercise.IsDeleted = true;
+            exercise.IsActive = false;
 
-            if (hasActivities)
-            {
-                return BadRequest(
-                    "Нельзя удалить упражнение, пока для него существуют активности.");
-            }
-
-            _context.Exercises.Remove(exercise);
             await _context.SaveChangesAsync();
 
             return NoContent();

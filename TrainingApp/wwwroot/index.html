@@ -9,6 +9,36 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-soft: #f1f5f9;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-soft: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --muted: #64748b;
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --success: #4ade80;
+            --danger: #f87171;
+            --border: #475569;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -17,40 +47,121 @@
 
         body {
             font-family: "Segoe UI", Roboto, sans-serif;
-            background: #f0f2f5;
-            padding: 24px;
-            color: #1e293b;
+            background: var(--bg);
+            padding: 20px;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+            transform: scale(1.5);
+            transform-origin: top center;
+            width: 66.67%;
+            margin: 0 auto;
         }
 
         .app {
-            max-width: 1300px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 28px 32px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            background: var(--surface);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transition: background 0.3s;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
         }
 
         h1 {
-            margin-bottom: 28px;
-            padding-bottom: 16px;
-            color: #0b1a33;
-            font-size: 28px;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #2563eb;
+            color: var(--text);
+            font-size: 24px;
+            font-weight: 600;
         }
 
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .theme-toggle label {
+                font-size: 12px;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+
+        .theme-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+            .theme-switch.active {
+                background: var(--primary);
+            }
+
+            .theme-switch::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 20px;
+                height: 20px;
+                background: #fff;
+                border-radius: 50%;
+                transition: transform 0.3s;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .theme-switch.active::after {
+                transform: translateX(20px);
+            }
+
         .user-info {
-            margin-top: -18px;
-            margin-bottom: 20px;
-            color: #64748b;
-            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            font-size: 12px;
         }
 
             .user-info strong {
-                color: #334155;
+                color: var(--text);
                 font-family: Consolas, monospace;
+            }
+
+        .stats-toggle {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.15s;
+        }
+
+            .stats-toggle:hover {
+                opacity: 0.8;
+            }
+
+            .stats-toggle .arrow {
+                font-size: 14px;
+                transition: transform 0.3s;
+            }
+
+            .stats-toggle.collapsed .arrow {
+                transform: rotate(-90deg);
             }
 
         .notifications {
@@ -60,24 +171,25 @@
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-width: 400px;
+            gap: 8px;
+            max-width: 360px;
         }
 
         .notification {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
-            background: #fff;
-            border-left: 4px solid #2563eb;
-            border-radius: 8px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border-left: 3px solid var(--primary);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
 
             .notification.error {
                 background: #fef2f2;
-                border-left-color: #dc2626;
+                border-left-color: var(--danger);
             }
 
             .notification.warning {
@@ -85,25 +197,33 @@
                 border-left-color: #f59e0b;
             }
 
-            .notification .text {
-                flex: 1;
-                font-size: 14px;
-                font-weight: 500;
-            }
+        [data-theme="dark"] .notification.error {
+            background: #450a0a;
+        }
 
-            .notification .close {
-                padding: 0 4px;
-                color: #64748b;
-                font-size: 18px;
-                background: none;
-                border: none;
-                cursor: pointer;
-                transition: color 0.15s;
-            }
+        [data-theme="dark"] .notification.warning {
+            background: #451a03;
+        }
 
-                .notification .close:hover {
-                    color: #1e293b;
-                }
+        .notification .text {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .notification .close {
+            padding: 0 4px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+            .notification .close:hover {
+                color: var(--text);
+            }
 
         @keyframes blink {
             0% {
@@ -126,32 +246,35 @@
         .tabs {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 28px;
-            border-bottom: 1px solid #dde1e6;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: var(--surface-soft);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
             .tabs button {
-                margin-bottom: -1px;
-                padding: 10px 24px;
-                color: #64748b;
-                font-size: 15px;
-                font-weight: 500;
+                padding: 8px 18px;
+                color: var(--text-secondary);
+                font-size: 13px;
+                font-weight: 600;
                 background: transparent;
                 border: none;
-                border-bottom: 2px solid transparent;
+                border-radius: 6px;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.15s;
             }
 
                 .tabs button.active {
-                    color: #2563eb;
-                    border-bottom-color: #2563eb;
+                    color: #fff;
+                    background: var(--primary);
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
                 }
 
-                .tabs button:hover {
-                    color: #1e293b;
-                    background: #f8fafc;
+                .tabs button:hover:not(.active) {
+                    color: var(--text);
+                    background: rgba(0, 0, 0, 0.05);
                 }
 
         .tab-content {
@@ -160,7 +283,7 @@
 
         @keyframes fade {
             0% {
-                opacity: 0.3;
+                opacity: 0.5;
             }
 
             100% {
@@ -168,275 +291,399 @@
             }
         }
 
-        .card {
-            margin-bottom: 24px;
-            padding: 20px 24px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .card-title {
-            margin-bottom: 16px;
-            color: #1e293b;
-            font-size: 16px;
+        .stat-card {
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 16px;
+            transition: transform 0.2s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-2px);
+            }
+
+        .stat-card-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .stat-card-primary .stat-label {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .stat-card strong {
+            display: block;
+            font-size: 24px;
+            line-height: 1;
+            margin-bottom: 4px;
             font-weight: 600;
         }
 
-        .flex-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px 16px;
-            margin-bottom: 4px;
+        .stat-card small {
+            color: var(--text-secondary);
+            font-size: 11px;
         }
 
-            .flex-row label {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                color: #334155;
-                font-size: 14px;
+        .stat-card-primary small {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .card {
+            margin-bottom: 18px;
+            padding: 16px;
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+        }
+
+        .card-title {
+            margin-bottom: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: -6px;
+            margin-bottom: 12px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 150px;
+        }
+
+            .form-field label {
+                margin-bottom: 4px;
+                color: var(--text-secondary);
+                font-size: 11px;
                 font-weight: 500;
-                white-space: nowrap;
             }
 
-            .flex-row input,
-            .flex-row select {
-                flex: 1 1 160px;
-                min-width: 140px;
-                padding: 8px 12px;
+            .form-field input,
+            .form-field select {
+                height: 32px;
+                padding: 6px 10px;
                 font-size: 14px;
-                background: #fff;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 5px;
+                color: var(--text);
                 transition: border 0.15s;
             }
 
-                .flex-row input:focus,
-                .flex-row select:focus {
+            .form-field select {
+                font-size: 15px;
+            }
+
+                .form-field input:focus,
+                .form-field select:focus {
                     outline: none;
-                    border-color: #2563eb;
-                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+                    border-color: var(--primary);
                 }
 
-                .flex-row input[type="checkbox"] {
-                    width: 18px;
-                    height: 18px;
-                    min-width: auto;
-                    accent-color: #2563eb;
-                    cursor: pointer;
+            .form-field input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                accent-color: var(--primary);
+                cursor: pointer;
+            }
+
+            .form-field .checkbox-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                height: 32px;
+            }
+
+                .form-field .checkbox-wrapper span {
+                    font-size: 12px;
+                    color: var(--text-secondary);
+                    font-weight: 500;
                 }
 
         button {
-            padding: 8px 20px;
+            height: 32px;
+            padding: 0 16px;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            background: #2563eb;
+            background: var(--primary);
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             transition: background 0.15s;
-            white-space: nowrap;
         }
 
             button:hover {
-                background: #1d4ed8;
+                background: var(--primary-hover);
             }
 
             button.secondary {
-                background: #64748b;
+                background: var(--text-secondary);
             }
 
                 button.secondary:hover {
-                    background: #475569;
+                    background: var(--muted);
                 }
 
         table {
             width: 100%;
-            font-size: 14px;
+            font-size: 13px;
             border-collapse: collapse;
         }
 
         th,
         td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
             vertical-align: middle;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
         }
 
         th {
-            color: #1e293b;
-            font-size: 13px;
+            color: var(--text-secondary);
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
             text-transform: uppercase;
-            background: #f1f5f9;
+            background: var(--surface-soft);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 14px;
-            color: #1e293b;
-            font-size: 12px;
+            padding: 3px 10px;
+            color: var(--text);
+            font-size: 11px;
             font-weight: 600;
-            background: #cbd5e1;
-            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
         }
 
             .badge.active {
                 color: #fff;
-                background: #22c55e;
+                background: var(--success);
+                border: none;
             }
 
             .badge.inactive {
                 color: #fff;
-                background: #ef4444;
+                background: var(--danger);
+                border: none;
             }
 
         .sticker {
             display: inline-block;
-            padding: 4px 14px;
-            color: #1e293b;
-            font-size: 13px;
+            padding: 3px 10px;
+            color: var(--text);
+            font-size: 11px;
             font-weight: 600;
-            background: #e2e8f0;
-            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
         }
 
             .sticker.yellow {
                 background: #facc15;
+                color: #000;
+                border: none;
             }
 
             .sticker.green {
                 color: #fff;
-                background: #22c55e;
+                background: var(--success);
+                border: none;
             }
 
             .sticker.red {
                 color: #fff;
-                background: #ef4444;
+                background: var(--danger);
+                border: none;
             }
 
         .filter-section {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 12px 20px;
-            margin-bottom: 20px;
-            padding: 14px 20px;
-            background: #f1f5f9;
-            border-radius: 8px;
+            gap: 10px 16px;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: var(--surface-soft);
+            border-radius: 7px;
+            border: 1px solid var(--border);
         }
 
-            .filter-section.compact {
-                margin-bottom: 16px;
-            }
-
             .filter-section label {
-                color: #334155;
-                font-size: 14px;
+                color: var(--text-secondary);
+                font-size: 12px;
                 font-weight: 500;
             }
 
             .filter-section input[type="date"],
             .filter-section input[type="number"],
             .filter-section select {
-                width: 140px;
-                padding: 6px 12px;
-                font-size: 14px;
-                background: #fff;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
+                height: 30px;
+                padding: 5px 10px;
+                font-size: 12px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 5px;
+                color: var(--text);
             }
 
             .filter-section .total-info {
                 display: flex;
                 align-items: center;
-                gap: 12px;
+                gap: 10px;
                 margin-left: auto;
-                font-size: 15px;
+                font-size: 13px;
                 font-weight: 500;
             }
 
         .month-filter {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
             .month-filter input[type="number"] {
-                width: 80px;
+                width: 70px;
             }
 
                 .month-filter input[type="number"]:last-child {
-                    width: 70px;
+                    width: 60px;
                 }
 
         .actions-cell {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px;
         }
 
             .actions-cell button {
-                padding: 4px 12px;
-                font-size: 12px;
-                border-radius: 4px;
+                height: 28px;
+                padding: 0 10px;
+                font-size: 11px;
             }
 
                 .actions-cell button.del {
-                    background: #dc2626;
+                    background: var(--danger);
                 }
 
                     .actions-cell button.del:hover {
-                        background: #b91c1c;
+                        background: #dc2626;
                     }
 
         .empty {
-            padding: 20px 0;
-            color: #94a3b8;
+            padding: 18px 0;
+            color: var(--muted);
             font-style: italic;
             text-align: center;
+            font-size: 12px;
         }
 
         .edit-panel {
-            margin-top: 16px;
-            padding: 16px 20px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            margin-top: 14px;
+            padding: 14px 16px;
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 7px;
         }
 
-            .edit-panel .flex-row {
+            .edit-panel .form-row {
                 margin-bottom: 0;
             }
 
         .inactive-exercise-warning {
-            margin-bottom: 12px;
-            color: #b91c1c;
-            font-size: 14px;
+            margin-bottom: 10px;
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(239, 68, 68, 0.08);
+            padding: 8px 10px;
+            border-radius: 5px;
+            border-left: 3px solid var(--danger);
         }
 
-        @media (max-width: 700px) {
+        .activity-date {
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+
+        .exercise-name {
+            font-weight: 500;
+        }
+
+        .minutes-value {
+            color: var(--primary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 850px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
             body {
-                padding: 12px;
+                padding: 10px;
+                transform: scale(1.3);
+                transform-origin: top center;
+                width: 76.92%;
             }
 
             .app {
                 padding: 16px;
             }
 
-            .flex-row,
+            .app-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .form-row,
             .filter-section {
                 flex-direction: column;
                 align-items: stretch;
             }
-
-                .flex-row label {
-                    white-space: normal;
-                }
 
                 .filter-section .total-info {
                     margin-left: 0;
@@ -458,7 +705,7 @@
                 }
 
             table {
-                font-size: 13px;
+                font-size: 12px;
             }
 
             th,
@@ -467,8 +714,8 @@
             }
 
             .tabs button {
-                padding: 8px 14px;
-                font-size: 14px;
+                padding: 7px 14px;
+                font-size: 12px;
             }
 
             .notifications {
@@ -492,36 +739,115 @@
         </div>
 
         <div class="app">
-            <h1>Система учёта тренировок</h1>
+            <div class="app-header">
+                <h1>Система учёта тренировок</h1>
+                <div class="theme-toggle">
+                    <label>Тёмная тема</label>
+                    <div class="theme-switch" :class="{ active: isDark }" @click="toggleTheme"></div>
+                </div>
+            </div>
 
             <div class="user-info">
-                Анонимный пользователь: <strong>{{ userId }}</strong>
+                <span>Анонимный пользователь: <strong>{{ userId }}</strong></span>
+                <span class="stats-toggle" :class="{ collapsed: !showStats }" @click="showStats = !showStats">
+                    {{ showStats ? 'Скрыть статистику' : 'Показать статистику' }}
+                    <span class="arrow">▼</span>
+                </span>
+            </div>
+
+            <!-- Панель статистики -->
+            <div class="dashboard-grid" v-show="showStats">
+                <div class="stat-card stat-card-primary">
+                    <span class="stat-label">Сегодня</span>
+                    <strong>{{ todayTotalMinutes }} мин</strong>
+                    <small>{{ todayActivitiesCount }} активности</small>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">За месяц</span>
+                    <strong>{{ monthTotalMinutes }} мин</strong>
+                    <small>Общее время</small>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Статус</span>
+                    <strong>{{ todayStatus }}</strong>
+                    <small>По нагрузке за день</small>
+                </div>
             </div>
 
             <div class="tabs">
+                <button :class="{ active: tab === 'today' }" @click="tab = 'today'">
+                    Сегодня
+                </button>
+                <button :class="{ active: tab === 'activities' }" @click="tab = 'activities'">
+                    Активности
+                </button>
                 <button :class="{ active: tab === 'programs' }" @click="tab = 'programs'">
                     Программы
                 </button>
                 <button :class="{ active: tab === 'exercises' }" @click="tab = 'exercises'">
                     Упражнения
                 </button>
-                <button :class="{ active: tab === 'activities' }" @click="tab = 'activities'">
-                    Активности
-                </button>
             </div>
 
+            <!-- Вкладка Сегодня -->
+            <div v-show="tab === 'today'" class="tab-content">
+                <div class="card">
+                    <div class="card-title">Активность за сегодня</div>
+                    <p class="card-subtitle">
+                        Все ваши тренировки за текущий день
+                    </p>
+
+                    <div v-if="todayActivities.length === 0" class="empty">
+                        За сегодня нет записей. Добавьте первую активность!
+                    </div>
+
+                    <table v-else>
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Упражнение</th>
+                                <th>Минуты</th>
+                                <th>Примечания</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="a in todayActivities" :key="a.id">
+                                <td><span class="activity-date">{{ formatDate(a.date) }}</span></td>
+                                <td><span class="exercise-name">{{ getExerciseName(a.exerciseId) }}</span></td>
+                                <td><span class="minutes-value">{{ a.minutes }} мин</span></td>
+                                <td>{{ a.notes || '—' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Вкладка Программы -->
             <div v-show="tab === 'programs'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Добавить программу</div>
-
-                    <div class="flex-row">
-                        <input v-model="newProgram.name" placeholder="Название">
-                        <input v-model="newProgram.type" placeholder="Тип (Силовая, Кардио...)">
-                        <label>
-                            <input type="checkbox" v-model="newProgram.isActive">
-                            Активна
-                        </label>
-                        <button @click="addProgram">Добавить</button>
+                    <p class="card-subtitle">
+                        Создайте новую тренировочную программу
+                    </p>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Название</label>
+                            <input v-model="newProgram.name" placeholder="Силовая">
+                        </div>
+                        <div class="form-field">
+                            <label>Тип</label>
+                            <input v-model="newProgram.type" placeholder="Силовая, Кардио...">
+                        </div>
+                        <div class="form-field" style="flex: 0 0 auto;">
+                            <label>&nbsp;</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" v-model="newProgram.isActive">
+                                <span>Активна</span>
+                            </div>
+                        </div>
+                        <button @click="addProgram" style="margin-top: 0;">Добавить</button>
                     </div>
                 </div>
 
@@ -556,50 +882,63 @@
 
                 <div v-if="editingProgram" class="edit-panel">
                     <div class="card-title">Редактирование программы</div>
-
-                    <div class="flex-row">
-                        <input v-model="editProgram.name" placeholder="Название">
-                        <input v-model="editProgram.type" placeholder="Тип">
-                        <label>
-                            <input type="checkbox" v-model="editProgram.isActive">
-                            Активна
-                        </label>
-                        <button @click="saveEditProgram">Сохранить</button>
-                        <button class="secondary" @click="cancelEditProgram">Отмена</button>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Название</label>
+                            <input v-model="editProgram.name" placeholder="Название">
+                        </div>
+                        <div class="form-field">
+                            <label>Тип</label>
+                            <input v-model="editProgram.type" placeholder="Тип">
+                        </div>
+                        <div class="form-field" style="flex: 0 0 auto;">
+                            <label>&nbsp;</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" v-model="editProgram.isActive">
+                                <span>Активна</span>
+                            </div>
+                        </div>
+                        <button @click="saveEditProgram" style="margin-top: 0;">Сохранить</button>
+                        <button class="secondary" @click="cancelEditProgram" style="margin-top: 0;">Отмена</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Вкладка Упражнения -->
             <div v-show="tab === 'exercises'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Добавить упражнение</div>
-
-                    <div class="flex-row">
-                        <input v-model="newExercise.name" placeholder="Название упражнения">
-
-                        <select v-model="newExercise.programId">
-                            <option v-for="p in programs" :key="p.id" :value="p.id">
-                                {{ p.name }}
-                            </option>
-                        </select>
-
-                        <label>
-                            <input type="checkbox" v-model="newExercise.isActive">
-                            Активно
-                        </label>
-
-                        <button @click="addExercise">Добавить</button>
+                    <p class="card-subtitle">
+                        Добавьте упражнение в программу
+                    </p>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Название</label>
+                            <input v-model="newExercise.name" placeholder="Приседания">
+                        </div>
+                        <div class="form-field">
+                            <label>Программа</label>
+                            <select v-model="newExercise.programId">
+                                <option v-for="p in programs" :value="p.id">{{ p.name }}</option>
+                            </select>
+                        </div>
+                        <div class="form-field" style="flex: 0 0 auto;">
+                            <label>&nbsp;</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" v-model="newExercise.isActive">
+                                <span>Активно</span>
+                            </div>
+                        </div>
+                        <button @click="addExercise" style="margin-top: 0;">Добавить</button>
                     </div>
                 </div>
 
                 <div class="filter-section compact">
                     <label>Фильтр по программе:</label>
-
-                    <select v-model="exerciseFilterProgramId" @change="loadExercises">
+                    <select v-model="exerciseFilterProgramId" @change="loadExercises"
+                            style="min-width:180px;">
                         <option :value="null">Все программы</option>
-                        <option v-for="p in programs" :key="p.id" :value="p.id">
-                            {{ p.name }}
-                        </option>
+                        <option v-for="p in programs" :value="p.id">{{ p.name }}</option>
                     </select>
                 </div>
 
@@ -634,58 +973,68 @@
 
                 <div v-if="editingExercise" class="edit-panel">
                     <div class="card-title">Редактирование упражнения</div>
-
-                    <div class="flex-row">
-                        <input v-model="editExercise.name" placeholder="Название">
-
-                        <select v-model="editExercise.programId">
-                            <option v-for="p in programs" :key="p.id" :value="p.id">
-                                {{ p.name }}
-                            </option>
-                        </select>
-
-                        <label>
-                            <input type="checkbox" v-model="editExercise.isActive">
-                            Активно
-                        </label>
-
-                        <button @click="saveEditExercise">Сохранить</button>
-                        <button class="secondary" @click="cancelEditExercise">Отмена</button>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Название</label>
+                            <input v-model="editExercise.name" placeholder="Название">
+                        </div>
+                        <div class="form-field">
+                            <label>Программа</label>
+                            <select v-model="editExercise.programId">
+                                <option v-for="p in programs" :key="p.id" :value="p.id">
+                                    {{ p.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-field" style="flex: 0 0 auto;">
+                            <label>&nbsp;</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" v-model="editExercise.isActive">
+                                <span>Активно</span>
+                            </div>
+                        </div>
+                        <button @click="saveEditExercise" style="margin-top: 0;">Сохранить</button>
+                        <button class="secondary" @click="cancelEditExercise" style="margin-top: 0;">Отмена</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Вкладка Активности -->
             <div v-show="tab === 'activities'" class="tab-content">
                 <div class="card">
                     <div class="card-title">Записать активность</div>
-
-                    <div class="flex-row">
-                        <select v-model="newActivity.exerciseId">
-                            <option v-for="e in activeExercises" :key="e.id" :value="e.id">
-                                {{ e.name }}
-                            </option>
-                        </select>
-
-                        <input type="date" v-model="newActivity.date">
-
-                        <input type="number"
-                               v-model.number="newActivity.minutes"
-                               placeholder="Минуты (1–1440)"
-                               min="1"
-                               max="1440">
-
-                        <input v-model="newActivity.notes" placeholder="Примечания">
-
-                        <button @click="addActivity">Добавить</button>
+                    <p class="card-subtitle">
+                        Добавьте упражнение и укажите продолжительность
+                    </p>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Упражнение</label>
+                            <select v-model="newActivity.exerciseId">
+                                <option v-for="e in activeExercises" :value="e.id">{{ e.name }}</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Дата</label>
+                            <input type="date" v-model="newActivity.date">
+                        </div>
+                        <div class="form-field">
+                            <label>Минуты</label>
+                            <input type="number" v-model.number="newActivity.minutes" min="1" max="1440" placeholder="45">
+                        </div>
+                        <div class="form-field">
+                            <label>Примечания</label>
+                            <input v-model="newActivity.notes" placeholder="Необязательно">
+                        </div>
+                        <button @click="addActivity" style="margin-top: 0;">Добавить</button>
                     </div>
                 </div>
 
                 <div class="filter-section">
                     <label>Показать за:</label>
 
-                    <button @click="filterType = 'all'">Всё время</button>
-                    <button @click="filterType = 'day'">День</button>
-                    <button @click="filterType = 'month'">Месяц</button>
+                    <button @click="filterType='day'">День</button>
+                    <button @click="filterType='month'">Месяц</button>
+                    <button @click="filterType='all'">Всё время</button>
 
                     <input v-if="filterType === 'day'"
                            type="date"
@@ -704,7 +1053,7 @@
                     </div>
 
                     <div class="total-info">
-                        <span>Сумма: {{ filteredTotalMinutes }} мин</span>
+                        <span>Всего: {{ filteredTotalMinutes }} мин</span>
 
                         <span v-if="filterType === 'day'"
                               class="sticker"
@@ -726,9 +1075,9 @@
                     </thead>
                     <tbody>
                         <tr v-for="a in filteredActivities" :key="a.id">
-                            <td>{{ formatDate(a.date) }}</td>
-                            <td>{{ getExerciseName(a.exerciseId) }}</td>
-                            <td>{{ a.minutes }}</td>
+                            <td><span class="activity-date">{{ formatDate(a.date) }}</span></td>
+                            <td><span class="exercise-name">{{ getExerciseName(a.exerciseId) }}</span></td>
+                            <td><span class="minutes-value">{{ a.minutes }} мин</span></td>
                             <td>{{ a.notes || '—' }}</td>
                             <td class="actions-cell">
                                 <button @click="startEditActivity(a)">Изменить</button>
@@ -750,33 +1099,41 @@
                         количество минут и примечание редактировать можно.
                     </div>
 
-                    <div class="flex-row">
-                        <select v-model="editActivity.exerciseId"
-                                :disabled="editingActivityExerciseIsInactive">
-                            <option v-if="editingActivityExerciseIsInactive"
-                                    :value="editActivity.exerciseId">
-                                {{ getExerciseName(editActivity.exerciseId) }} — неактивно
-                            </option>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Упражнение</label>
+                            <select v-model="editActivity.exerciseId"
+                                    :disabled="editingActivityExerciseIsInactive">
+                                <option v-if="editingActivityExerciseIsInactive"
+                                        :value="editActivity.exerciseId">
+                                    {{ getExerciseName(editActivity.exerciseId) }} — неактивно
+                                </option>
 
-                            <option v-for="e in activeExercises"
-                                    :key="e.id"
-                                    :value="e.id">
-                                {{ e.name }}
-                            </option>
-                        </select>
-
-                        <input type="date" v-model="editActivity.date">
-
-                        <input type="number"
-                               v-model.number="editActivity.minutes"
-                               placeholder="Минуты"
-                               min="1"
-                               max="1440">
-
-                        <input v-model="editActivity.notes" placeholder="Примечания">
-
-                        <button @click="saveEditActivity">Сохранить</button>
-                        <button class="secondary" @click="cancelEditActivity">Отмена</button>
+                                <option v-for="e in activeExercises"
+                                        :key="e.id"
+                                        :value="e.id">
+                                    {{ e.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Дата</label>
+                            <input type="date" v-model="editActivity.date">
+                        </div>
+                        <div class="form-field">
+                            <label>Минуты</label>
+                            <input type="number"
+                                   v-model.number="editActivity.minutes"
+                                   placeholder="Минуты"
+                                   min="1"
+                                   max="1440">
+                        </div>
+                        <div class="form-field">
+                            <label>Примечания</label>
+                            <input v-model="editActivity.notes" placeholder="Примечания">
+                        </div>
+                        <button @click="saveEditActivity" style="margin-top: 0;">Сохранить</button>
+                        <button class="secondary" @click="cancelEditActivity" style="margin-top: 0;">Отмена</button>
                     </div>
                 </div>
             </div>
@@ -807,7 +1164,9 @@
             data() {
                 return {
                     userId: currentUserId,
-                    tab: "programs",
+                    tab: "today",
+                    isDark: false,
+                    showStats: true,
 
                     programs: [],
                     exercises: [],
@@ -826,13 +1185,13 @@
                     },
 
                     newActivity: {
-                        exerciseId: 1,
+                        exerciseId: null,
                         date: this.today(),
-                        minutes: 30,
+                        minutes: null,
                         notes: ""
                     },
 
-                    filterType: "all",
+                    filterType: "day",
                     filterDate: this.today(),
                     filterMonthYear: new Date().getFullYear(),
                     filterMonth: new Date().getMonth() + 1,
@@ -860,9 +1219,9 @@
                     editingActivity: false,
                     editActivity: {
                         id: null,
-                        exerciseId: 1,
+                        exerciseId: null,
                         date: "",
-                        minutes: 30,
+                        minutes: null,
                         notes: ""
                     }
                 };
@@ -871,6 +1230,34 @@
             computed: {
                 activeExercises() {
                     return this.exercises.filter(e => e.isActive);
+                },
+
+                todayActivities() {
+                    const today = this.today();
+                    return this.activities.filter(a => a.date.substring(0, 10) === today);
+                },
+
+                todayTotalMinutes() {
+                    return this.todayActivities.reduce((sum, a) => sum + a.minutes, 0);
+                },
+
+                todayActivitiesCount() {
+                    return this.todayActivities.length;
+                },
+
+                monthTotalMinutes() {
+                    const prefix = this.today().substring(0, 7);
+                    return this.activities
+                        .filter(a => a.date.startsWith(prefix))
+                        .reduce((sum, a) => sum + a.minutes, 0);
+                },
+
+                todayStatus() {
+                    const total = this.todayTotalMinutes;
+                    if (total === 0) return 'Нет записей';
+                    if (total < 30) return 'Низкая';
+                    if (total <= 90) return 'Норма';
+                    return 'Высокая';
                 },
 
                 editingActivityExerciseIsInactive() {
@@ -949,6 +1336,12 @@
             methods: {
                 today() {
                     return new Date().toISOString().slice(0, 10);
+                },
+
+                toggleTheme() {
+                    this.isDark = !this.isDark;
+                    document.documentElement.setAttribute('data-theme', this.isDark ? 'dark' : 'light');
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
                 },
 
                 addNotification(text, type = "error") {
@@ -1081,6 +1474,10 @@
                     this.exercises = await this.request("get", url);
                 },
 
+                async loadAllExercises() {
+                    this.exercises = await this.request('get', '/api/exercises?includeDeleted=true');
+                },
+
                 async addExercise() {
                     if (!this.newExercise.name) {
                         this.addNotification(
@@ -1191,15 +1588,13 @@
                 },
 
                 async addActivity() {
-                    const exercise = this.exercises.find(
-                        e => e.id === this.newActivity.exerciseId
-                    );
-
-                    if (!exercise || !exercise.isActive) {
-                        this.addNotification(
-                            "Выберите активное упражнение",
-                            "warning"
-                        );
+                    const ex = this.exercises.find(e => e.id === this.newActivity.exerciseId);
+                    if (!ex || !ex.isActive) {
+                        this.addNotification('Выберите активное упражнение', 'warning');
+                        return;
+                    }
+                    if (!this.newActivity.minutes || this.newActivity.minutes < 1 || this.newActivity.minutes > 1440) {
+                        this.addNotification('Введите минуты от 1 до 1440', 'warning');
                         return;
                     }
 
@@ -1230,7 +1625,7 @@
 
                     this.newActivity = {
                         ...this.newActivity,
-                        minutes: 30,
+                        minutes: null,
                         notes: ""
                     };
 
@@ -1322,11 +1717,10 @@
                 },
 
                 getExerciseName(exerciseId) {
-                    const exercise = this.exercises.find(
-                        e => e.id === exerciseId
-                    );
-
-                    return exercise ? exercise.name : "Удалено";
+                    const e = this.exercises.find(e => e.id === exerciseId);
+                    if (!e) return '❌ Удалено';
+                    if (e.isDeleted) return `${e.name} (удалено)`;
+                    return e.name;
                 },
 
                 formatDate(dateString) {
@@ -1339,8 +1733,15 @@
             },
 
             mounted() {
+                // Загрузка темы
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    this.isDark = true;
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+
                 this.loadPrograms().then(() => {
-                    this.loadExercises();
+                    this.loadAllExercises();
                     this.loadActivities();
                 });
             }

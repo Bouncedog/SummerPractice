@@ -9,5 +9,6 @@ public class ExerciseDto
     public string Name { get; set; }
     public int ProgramId { get; set; }
     public bool IsActive { get; set; }
-    public string ProgramName { get; set; }   //Для отображения
+    public string ProgramName { get; set; }
+    public bool IsDeleted { get; set; }
 }

@@ -25,11 +25,7 @@ namespace TrainingApp.Controllers
             if (Request.Headers.TryGetValue("X-UserId", out var userId))
                 return userId.ToString();
 
-#if DEBUG
-            return "dev-user";
-#else
-    return "default";
-#endif
+            throw new InvalidOperationException("Заголовок X-UserId не найден.");
         }
 
         /// <summary>
